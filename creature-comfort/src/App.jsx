@@ -10,7 +10,7 @@ import BottomNav from './components/BottomNav'
 import './App.css'
 
 export default function App() {
-  const [state, update] = useStore()
+  const [state, update, reset] = useStore()
   const [tab, setTab] = useState('home')
   const [surfing, setSurfing] = useState(false)
 
@@ -71,7 +71,7 @@ export default function App() {
           <Intentions state={state} update={update} />
         )}
         {tab === 'stats' && (
-          <Stats state={state} />
+          <Stats state={state} update={update} onReset={reset} />
         )}
       </div>
 

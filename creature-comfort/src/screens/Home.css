@@ -165,5 +165,86 @@
 .btn-used { color: var(--red); border-color: var(--red-dim); }
 .btn-used:active { background: var(--red-dim); }
 
-.btn-resisted { color: var(--text-dim); }
+.btn-resisted {
+  color: var(--text-dim);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
 .btn-resisted:active { background: var(--border); }
+
+.btn-friction {
+  font-family: var(--prose);
+  font-size: 10px;
+  font-style: italic;
+  font-weight: 300;
+  color: var(--text-muted);
+  letter-spacing: 0;
+}
+
+/* I lied correction */
+.btn-lied {
+  width: 100%;
+  padding: 6px;
+  font-family: var(--prose);
+  font-size: 12px;
+  font-style: italic;
+  font-weight: 300;
+  color: var(--text-muted);
+  text-align: center;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 0.15s, color 0.15s;
+}
+.btn-lied:active { opacity: 1; color: var(--text-dim); }
+
+/* Creature speech bubble — floats above the canvas */
+.creature-bubble {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--surface);
+  border: 2px solid var(--border-hi);
+  padding: 7px 14px;
+  max-width: 210px;
+  text-align: center;
+  font-family: var(--prose);
+  font-style: italic;
+  font-size: 13px;
+  color: var(--text-dim);
+  white-space: normal;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  pointer-events: none;
+  z-index: 5;
+}
+.creature-bubble::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 6px solid var(--border-hi);
+}
+.creature-bubble.visible { opacity: 1; }
+
+/* Creature message (honesty reward / I lied response) */
+.creature-msg {
+  min-height: 36px;
+  padding: 0 28px;
+  text-align: center;
+  font-size: 14px;
+  color: var(--accent);
+  line-height: 1.5;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  flex-shrink: 0;
+  font-style: italic;
+}
+.creature-msg.visible { opacity: 1; }

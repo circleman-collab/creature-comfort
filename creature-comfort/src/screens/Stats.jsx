@@ -6,8 +6,18 @@ import {
 import { EVENT } from '../constants'
 import './Stats.css'
 
-export default function Stats({ state }) {
+const FAREWELL_MESSAGES = [
+  'New roots grow stronger.',
+  'Every beginning is brave.',
+  'We\'ll find each other again.',
+  'The forest remembers.',
+  'It\'s okay. We\'ll start again, together.',
+]
+
+export default function Stats({ state, onReset }) {
   const [tab, setTab] = useState('today')
+  const [resetStep, setResetStep] = useState(0)
+  const [farewellMsg, setFarewellMsg] = useState('')
 
   const todayStats = useMemo(() => getTodayStats(state.events), [state.events])
   const allStats   = useMemo(() => getAllStats(state.events), [state.events])
@@ -17,7 +27,6 @@ export default function Stats({ state }) {
     [state.events]
   )
 
-  // Log grouped by day — only computed when the log tab is active
   const eventsByDay = useMemo(() => {
     if (tab !== 'log') return null
     const map = {}
@@ -33,6 +42,11 @@ export default function Stats({ state }) {
   const resistRatio = (todayStats.uses + todayStats.resisted) > 0
     ? Math.round((todayStats.resisted / (todayStats.uses + todayStats.resisted)) * 100)
     : null
+
+  function beginReset() {
+    setFarewellMsg(FAREWELL_MESSAGES[Math.floor(Math.random() * FAREWELL_MESSAGES.length)])
+    setResetStep(1)
+  }
 
   return (
     <div className="stats">
@@ -131,6 +145,28 @@ export default function Stats({ state }) {
                   ? new Date(state.startedAt).toLocaleDateString([], {month:'short', day:'numeric', year:'numeric'})
                   : '—'
               }</div>
+            </div>
+
+            {/* Reset — separated from stats, at the bottom */}
+            <div className="reset-section">
+              {resetStep === 0 ? (
+                <button className="btn-reset" onClick={beginReset}>
+                  Reset everything
+                </button>
+              ) : (
+                <div className="reset-confirm">
+                  <div className="reset-farewell prose">"{farewellMsg}"</div>
+                  <div className="reset-sub">This will erase all progress.</div>
+                  <div className="reset-btns">
+                    <button className="btn-pixel danger" onClick={onReset}>
+                      Yes, start over
+                    </button>
+                    <button className="btn-reset-cancel" onClick={() => setResetStep(0)}>
+                      Never mind
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         )}

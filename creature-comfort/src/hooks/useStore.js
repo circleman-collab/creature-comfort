@@ -57,7 +57,13 @@ export function useStore() {
     setState(prev => typeof patch === 'function' ? patch(prev) : { ...prev, ...patch })
   }, [])
 
-  return [state, update]
+  // Hard reset: clears storage immediately and returns to onboarding
+  const reset = useCallback(() => {
+    setState({ ...DEFAULT_STATE })
+    try { localStorage.removeItem(STORAGE_KEY) } catch (e) {}
+  }, [])
+
+  return [state, update, reset]
 }
 
 // ── Pure helpers (no React) ──────────────────────────────
@@ -138,48 +144,48 @@ export function getAllStats(events) {
   }
 }
 
-// Compute health delta after a use event
+// Compute health delta after a use event.
+// Stage is never demoted on slip — stage is purely time-based.
 export function computeHealthAfterUse(state) {
   const now = Date.now()
   const recentSlip = state.lastSlipTs && (now - state.lastSlipTs) < TIMING.GRACE_WINDOW
   const consecutive = recentSlip ? state.consecutiveSlips + 1 : 1
 
   let newHealth = state.health
-  let newStage = state.stage
-  let newConsecutive = consecutive
 
   if (consecutive === 1) {
-    // Grace: wilt within stage
     newHealth = Math.max(state.health - HEALTH.SLIP_WILT_LOSS, HEALTH.MIN_AFTER_WILT)
   } else {
-    // Two close slips: bigger hit, possible stage demotion
-    newHealth = Math.max(state.health - HEALTH.SLIP_DEMOTE_LOSS, 0)
-    if (newHealth === 0 && newStage > 1) {
-      newStage = newStage - 1
-      newHealth = HEALTH.STAGE_RESET
-    }
+    // Multiple close slips: bigger hit, but still no stage demotion
+    newHealth = Math.max(state.health - HEALTH.SLIP_DEMOTE_LOSS, HEALTH.MIN_AFTER_WILT)
   }
 
-  return { health: newHealth, stage: newStage, consecutiveSlips: newConsecutive, lastSlipTs: now }
+  // Stage is time-based only — never set it back here
+  return { health: newHealth, stage: state.stage, consecutiveSlips: consecutive, lastSlipTs: now }
 }
 
-// Compute health gains over time (call periodically)
+// Compute passive health and stage gains over time (call periodically).
+// Stage advances purely on elapsed clean time from startedAt (or since last use).
+// Health fills independently as a visual within each stage.
 export function computeHealthGain(state) {
+  // Use last use as baseline; if never used, count from journey start
   const last = getLastUse(state.events)
-  if (!last) return state
+  const baseline = last ? last.ts : state.startedAt
+  if (!baseline) return state
 
-  const msSinceLast = Date.now() - last.ts
-  const hoursClean = msSinceLast / 3600000
+  const hoursClean = (Date.now() - baseline) / 3600000
 
   const targetStage = STAGE_THRESHOLDS_HOURS.reduce(
     (s, t, i) => hoursClean >= t ? i + 1 : s,
     1
   )
 
-  let newHealth = Math.min(state.health + (hoursClean > 0 ? HEALTH.PASSIVE_GAIN : 0), HEALTH.MAX)
+  // Health ticks up passively regardless of stage
+  let newHealth = Math.min(state.health + HEALTH.PASSIVE_GAIN, HEALTH.MAX)
   let newStage = state.stage
 
-  if (targetStage > state.stage && newHealth >= HEALTH.MAX) {
+  // Stage advances on time alone — no health gate
+  if (targetStage > state.stage) {
     newStage = Math.min(targetStage, 5)
     newHealth = HEALTH.INITIAL
   }
