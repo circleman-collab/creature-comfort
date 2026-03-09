@@ -1,32 +1,38 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import {
   getMsSinceLastUse, formatDuration, getTodayStats,
   getAllStats, sameDay, getDaysSinceLastUse
 } from '../hooks/useStore'
+import { EVENT } from '../constants'
 import './Stats.css'
 
 export default function Stats({ state }) {
   const [tab, setTab] = useState('today')
-  const todayStats = getTodayStats(state.events)
-  const allStats = getAllStats(state.events)
-  const msSinceUse = getMsSinceLastUse(state.events)
-  const daysSince = getDaysSinceLastUse(state.events)
 
-  const totalEvents = state.events.length
+  const todayStats = useMemo(() => getTodayStats(state.events), [state.events])
+  const allStats   = useMemo(() => getAllStats(state.events), [state.events])
+  const msSinceUse = useMemo(() => getMsSinceLastUse(state.events), [state.events])
+  const usedEvents = useMemo(
+    () => state.events.filter(e => e.type === EVENT.USED),
+    [state.events]
+  )
+
+  // Log grouped by day — only computed when the log tab is active
+  const eventsByDay = useMemo(() => {
+    if (tab !== 'log') return null
+    const map = {}
+    ;[...state.events].reverse().forEach(e => {
+      const d = new Date(e.ts)
+      const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`
+      if (!map[key]) map[key] = []
+      map[key].push(e)
+    })
+    return map
+  }, [state.events, tab])
+
   const resistRatio = (todayStats.uses + todayStats.resisted) > 0
     ? Math.round((todayStats.resisted / (todayStats.uses + todayStats.resisted)) * 100)
     : null
-
-  // Log grouped by day
-  const eventsByDay = {}
-  ;[...state.events].reverse().forEach(e => {
-    const d = new Date(e.ts)
-    const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`
-    if (!eventsByDay[key]) eventsByDay[key] = []
-    eventsByDay[key].push(e)
-  })
-
-  const usedEvents = state.events.filter(e => e.type === 'used')
 
   return (
     <div className="stats">
@@ -131,10 +137,10 @@ export default function Stats({ state }) {
 
         {tab === 'log' && (
           <div className="log-panel">
-            {Object.keys(eventsByDay).length === 0 && (
+            {eventsByDay && Object.keys(eventsByDay).length === 0 && (
               <div className="log-empty prose">No events yet. Start logging from the home screen.</div>
             )}
-            {Object.entries(eventsByDay).map(([day, events]) => {
+            {eventsByDay && Object.entries(eventsByDay).map(([day, events]) => {
               const ts = events[0].ts
               const isToday = sameDay(ts, Date.now())
               const isYesterday = sameDay(ts, Date.now() - 86400000)
@@ -147,7 +153,7 @@ export default function Stats({ state }) {
                     const t = new Date(e.ts)
                     const timeStr = t.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})
                     const usedIdx = usedEvents.findIndex(u => u.ts === e.ts)
-                    const gap = (e.type === 'used' && usedIdx > 0)
+                    const gap = (e.type === EVENT.USED && usedIdx > 0)
                       ? formatDuration(e.ts - usedEvents[usedIdx-1].ts, true)
                       : null
 
@@ -156,8 +162,8 @@ export default function Stats({ state }) {
                         <div className={`log-dot ${e.type}`} />
                         <div className="log-item-text">
                           <div className="log-item-type pixel">
-                            {e.type === 'used' ? 'Used'
-                              : e.type === 'craving_surfed' ? 'Surfed craving'
+                            {e.type === EVENT.USED ? 'Used'
+                              : e.type === EVENT.CRAVING_SURFED ? 'Surfed craving'
                               : 'Resisted'}
                           </div>
                           {gap && <div className="log-item-gap prose">{gap} since last</div>}

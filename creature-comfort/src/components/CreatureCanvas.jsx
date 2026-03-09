@@ -1,9 +1,10 @@
-import { useEffect, useRef } from 'react'
+import { memo, useEffect, useRef } from 'react'
 import { drawScene, SCALE } from '../utils/pixelRenderer'
 
 const SIZE = 64 * SCALE // 256px
 
-export default function CreatureCanvas({ stage, health, reacting }) {
+// memo: skip re-render unless stage or health actually change
+const CreatureCanvas = memo(function CreatureCanvas({ stage, health }) {
   const canvasRef = useRef(null)
   const tickRef = useRef(0)
   const rafRef = useRef(null)
@@ -28,7 +29,7 @@ export default function CreatureCanvas({ stage, health, reacting }) {
       running = false
       cancelAnimationFrame(rafRef.current)
     }
-  }, [stage, health, reacting])
+  }, [stage, health]) // reacting intentionally excluded — it never affected drawing logic
 
   return (
     <canvas
@@ -43,4 +44,6 @@ export default function CreatureCanvas({ stage, health, reacting }) {
       }}
     />
   )
-}
+})
+
+export default CreatureCanvas

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import CreatureCanvas from '../components/CreatureCanvas'
 import { getMsSinceLastUse, formatDuration, computeHealthAfterUse } from '../hooks/useStore'
+import { EVENT, HEALTH, TIMING, STAGE_NAMES } from '../constants'
 import './Home.css'
 
 export default function Home({ state, update, onCravingSurf }) {
@@ -21,18 +22,18 @@ export default function Home({ state, update, onCravingSurf }) {
   useEffect(() => {
     const id = setInterval(() => {
       setShowIntention(true)
-      setTimeout(() => setShowIntention(false), 6000)
-    }, 8 * 60 * 1000) // every 8 min
+      setTimeout(() => setShowIntention(false), TIMING.INTENTION_DISPLAY)
+    }, TIMING.INTENTION_INTERVAL)
     return () => clearInterval(id)
   }, [])
 
   function logUse() {
     setReacting(true)
-    setTimeout(() => setReacting(false), 1200)
+    setTimeout(() => setReacting(false), TIMING.REACT_ANIMATION)
 
     const now = Date.now()
     const healthDelta = computeHealthAfterUse(state)
-    const newEvent = { id: now, type: 'used', ts: now }
+    const newEvent = { id: now, type: EVENT.USED, ts: now }
 
     update(prev => ({
       ...prev,
@@ -46,8 +47,8 @@ export default function Home({ state, update, onCravingSurf }) {
     const now = Date.now()
     update(prev => ({
       ...prev,
-      events: [...prev.events, { id: now, type: 'resisted', ts: now }],
-      health: Math.min(prev.health + 3, 100),
+      events: [...prev.events, { id: now, type: EVENT.RESISTED, ts: now }],
+      health: Math.min(prev.health + HEALTH.RESISTED_GAIN, HEALTH.MAX),
       startedAt: prev.startedAt || now,
     }))
   }
@@ -60,19 +61,17 @@ export default function Home({ state, update, onCravingSurf }) {
   const intentions = [state.intentionBig, ...(state.intentions || []).map(i => i.text)]
   const currentIntention = intentions[Math.floor(Date.now() / 1000 / 60 / 8) % intentions.length]
 
-  const stageNames = ['', 'Seedling', 'Sprout', 'Wanderer', 'Blossoming', 'Radiant']
-
   return (
     <div className="home">
       {/* Header */}
       <div className="home-header">
         <div className="home-creature-name">{state.creatureName}</div>
-        <div className="home-stage-label">{stageNames[state.stage]}</div>
+        <div className="home-stage-label">{STAGE_NAMES[state.stage]}</div>
       </div>
 
       {/* Canvas */}
-      <div className="home-canvas-wrap">
-        <CreatureCanvas stage={state.stage} health={state.health} reacting={reacting} />
+      <div className={`home-canvas-wrap ${reacting ? 'reacting' : ''}`}>
+        <CreatureCanvas stage={state.stage} health={state.health} />
         {/* Health bar */}
         <div className="health-bar-wrap">
           <div className="health-bar">

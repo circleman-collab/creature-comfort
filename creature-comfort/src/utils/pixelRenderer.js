@@ -1,6 +1,8 @@
 // Pixel art renderer for the creature and environment
 // All drawing is done on a 64x64 logical canvas, scaled up
 
+import { HEALTH } from '../constants'
+
 export const SCALE = 4 // renders at 256x256 display
 
 // ── Palette ──────────────────────────────────────────────
@@ -33,7 +35,7 @@ function px(x, y, col) { return [x, y, col] }
 
 // ── Stage 1: Seedling (just a sprout) ────────────────────
 export function drawStage1(ctx, health, tick) {
-  const wilt = health < 40
+  const wilt = health < HEALTH.WILT_THRESHOLD
   const col = wilt ? C.w3 : C.g3
   const col2 = wilt ? C.w2 : C.g4
   const soil = C.b3
@@ -68,7 +70,7 @@ export function drawStage1(ctx, health, tick) {
 
 // ── Stage 2: Sprout with eyes + root-feet ────────────────
 export function drawStage2(ctx, health, tick) {
-  const wilt = health < 40
+  const wilt = health < HEALTH.WILT_THRESHOLD
   const bob = Math.floor(tick / 40) % 2 === 0 ? 0 : -1
   const col = wilt ? C.w3 : C.g3
   const col2 = wilt ? C.w2 : C.g4
@@ -109,7 +111,7 @@ export function drawStage2(ctx, health, tick) {
 
 // ── Stage 3: Leafy creature, can hop ─────────────────────
 export function drawStage3(ctx, health, tick) {
-  const wilt = health < 40
+  const wilt = health < HEALTH.WILT_THRESHOLD
   const hop = Math.floor(tick / 25) % 8
   const yOff = hop < 2 ? -2 : hop < 4 ? -4 : hop < 6 ? -2 : 0
   const col = wilt ? C.w3 : C.g3
@@ -161,7 +163,7 @@ export function drawStage3(ctx, health, tick) {
 
 // ── Stage 4: Fur growing through leaves ──────────────────
 export function drawStage4(ctx, health, tick) {
-  const wilt = health < 40
+  const wilt = health < HEALTH.WILT_THRESHOLD
   const breathe = Math.floor(tick / 50) % 2 === 0 ? 0 : -1
   const col = wilt ? C.w3 : C.g3
   const fur = wilt ? C.w2 : C.b4
@@ -281,7 +283,7 @@ export function drawStage5(ctx, health, tick) {
 
 export function drawEnvironment(ctx, stage, health, tick) {
   const W = 64, H = 64
-  const wilt = health < 40
+  const wilt = health < HEALTH.WILT_THRESHOLD
 
   // Sky gradient (gets lighter/richer with stage)
   const skyColors = [

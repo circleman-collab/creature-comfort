@@ -1,12 +1,14 @@
+import { memo } from 'react'
 import './BottomNav.css'
 
 const TABS = [
-  { id: 'home',       label: 'Home',       icon: '🌱' },
-  { id: 'intentions', label: 'Why',        icon: '✦' },
-  { id: 'stats',      label: 'Stats',      icon: '◈' },
+  { id: 'home',       label: 'Home',  icon: '🌱' },
+  { id: 'intentions', label: 'Why',   icon: '✦' },
+  { id: 'stats',      label: 'Stats', icon: '◈' },
 ]
 
-export default function BottomNav({ active, onChange }) {
+// memo: skip re-render unless the active tab changes
+const BottomNav = memo(function BottomNav({ active, onChange }) {
   return (
     <nav className="bottom-nav">
       {TABS.map(tab => (
@@ -21,4 +23,6 @@ export default function BottomNav({ active, onChange }) {
       ))}
     </nav>
   )
-}
+})
+
+export default BottomNav

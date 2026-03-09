@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useStore, computeHealthGain } from './hooks/useStore'
+import { HEALTH, TIMING } from './constants'
 import Onboarding from './screens/Onboarding'
 import Home from './screens/Home'
 import Intentions from './screens/Intentions'
@@ -23,7 +24,7 @@ export default function App() {
       })
     }
     tick()
-    const id = setInterval(tick, 5 * 60 * 1000)
+    const id = setInterval(tick, TIMING.HEALTH_TICK)
     return () => clearInterval(id)
   }, [update])
 
@@ -39,7 +40,7 @@ export default function App() {
             quitMode,
             startedAt: Date.now(),
             stage: 1,
-            health: 60,
+            health: HEALTH.INITIAL,
           })
         }}
       />

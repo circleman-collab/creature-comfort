@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import CreatureCanvas from '../components/CreatureCanvas'
+import { EVENT, HEALTH } from '../constants'
 import './CravingSurf.css'
 
 const TOTAL = 90 // seconds
@@ -49,8 +50,8 @@ export default function CravingSurf({ state, update, onClose }) {
     const now = Date.now()
     update(prev => ({
       ...prev,
-      events: [...prev.events, { id: now, type: 'craving_surfed', ts: now }],
-      health: Math.min(prev.health + 5, 100),
+      events: [...prev.events, { id: now, type: EVENT.CRAVING_SURFED, ts: now }],
+      health: Math.min(prev.health + HEALTH.SURF_GAIN, HEALTH.MAX),
     }))
     onClose()
   }
@@ -65,7 +66,9 @@ export default function CravingSurf({ state, update, onClose }) {
   const currentPhase = PHASES[phase]
 
   // Creature slightly stressed during craving, but with us
-  const surfHealth = done ? Math.min(state.health + 10, 100) : Math.max(state.health - 10, 20)
+  const surfHealth = done
+    ? Math.min(state.health + 10, HEALTH.MAX)
+    : Math.max(state.health - 10, HEALTH.MIN_AFTER_WILT)
 
   return (
     <div className="craving-surf">
@@ -108,7 +111,7 @@ export default function CravingSurf({ state, update, onClose }) {
       ) : (
         <div className="surf-done">
           <div className="surf-canvas-wrap">
-            <CreatureCanvas stage={state.stage} health={Math.min(state.health + 10, 100)} />
+            <CreatureCanvas stage={state.stage} health={Math.min(state.health + 10, HEALTH.MAX)} />
           </div>
           <div className="surf-done-title pixel">You made it.</div>
           <div className="surf-done-body prose">

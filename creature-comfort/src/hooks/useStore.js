@@ -1,6 +1,7 @@
-import { useState, useEffect, useCallback } from 'react'
-
-const KEY = 'cc_v1'
+import { useState, useEffect, useCallback, useRef } from 'react'
+import {
+  STORAGE_KEY, EVENT, HEALTH, STAGE_THRESHOLDS_HOURS, TIMING,
+} from '../constants'
 
 const DEFAULT_STATE = {
   // Onboarding
@@ -31,25 +32,29 @@ const DEFAULT_STATE = {
 
 function load() {
   try {
-    const raw = localStorage.getItem(KEY)
+    const raw = localStorage.getItem(STORAGE_KEY)
     if (raw) return { ...DEFAULT_STATE, ...JSON.parse(raw) }
   } catch (e) {}
   return { ...DEFAULT_STATE }
 }
 
 function save(state) {
-  try { localStorage.setItem(KEY, JSON.stringify(state)) } catch (e) {}
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)) } catch (e) {}
 }
 
 export function useStore() {
   const [state, setState] = useState(load)
+  const saveTimerRef = useRef(null)
+
+  // Debounce localStorage writes — batch rapid changes into one write per second
+  useEffect(() => {
+    clearTimeout(saveTimerRef.current)
+    saveTimerRef.current = setTimeout(() => save(state), TIMING.SAVE_DEBOUNCE)
+    return () => clearTimeout(saveTimerRef.current)
+  }, [state])
 
   const update = useCallback((patch) => {
-    setState(prev => {
-      const next = typeof patch === 'function' ? patch(prev) : { ...prev, ...patch }
-      save(next)
-      return next
-    })
+    setState(prev => typeof patch === 'function' ? patch(prev) : { ...prev, ...patch })
   }, [])
 
   return [state, update]
@@ -59,7 +64,7 @@ export function useStore() {
 
 export function getLastUse(events) {
   for (let i = events.length - 1; i >= 0; i--) {
-    if (events[i].type === 'used') return events[i]
+    if (events[i].type === EVENT.USED) return events[i]
   }
   return null
 }
@@ -109,15 +114,15 @@ export function getDaysSinceLastUse(events) {
 export function getTodayStats(events) {
   const now = Date.now()
   const today = events.filter(e => sameDay(e.ts, now))
-  const uses = today.filter(e => e.type === 'used')
-  const resisted = today.filter(e => e.type === 'resisted' || e.type === 'craving_surfed')
+  const uses = today.filter(e => e.type === EVENT.USED)
+  const resisted = today.filter(e => e.type === EVENT.RESISTED || e.type === EVENT.CRAVING_SURFED)
   return { uses: uses.length, resisted: resisted.length, total: today.length }
 }
 
 export function getAllStats(events) {
-  const uses = events.filter(e => e.type === 'used')
-  const resisted = events.filter(e => e.type === 'resisted' || e.type === 'craving_surfed')
-  const surfed = events.filter(e => e.type === 'craving_surfed')
+  const uses = events.filter(e => e.type === EVENT.USED)
+  const resisted = events.filter(e => e.type === EVENT.RESISTED || e.type === EVENT.CRAVING_SURFED)
+  const surfed = events.filter(e => e.type === EVENT.CRAVING_SURFED)
 
   let longestGapMs = 0
   for (let i = 1; i < uses.length; i++) {
@@ -136,7 +141,7 @@ export function getAllStats(events) {
 // Compute health delta after a use event
 export function computeHealthAfterUse(state) {
   const now = Date.now()
-  const recentSlip = state.lastSlipTs && (now - state.lastSlipTs) < 3 * 3600000 // within 3h
+  const recentSlip = state.lastSlipTs && (now - state.lastSlipTs) < TIMING.GRACE_WINDOW
   const consecutive = recentSlip ? state.consecutiveSlips + 1 : 1
 
   let newHealth = state.health
@@ -145,13 +150,13 @@ export function computeHealthAfterUse(state) {
 
   if (consecutive === 1) {
     // Grace: wilt within stage
-    newHealth = Math.max(state.health - 25, 20)
+    newHealth = Math.max(state.health - HEALTH.SLIP_WILT_LOSS, HEALTH.MIN_AFTER_WILT)
   } else {
-    // Two close slips: bigger hit
-    newHealth = Math.max(state.health - 45, 0)
+    // Two close slips: bigger hit, possible stage demotion
+    newHealth = Math.max(state.health - HEALTH.SLIP_DEMOTE_LOSS, 0)
     if (newHealth === 0 && newStage > 1) {
       newStage = newStage - 1
-      newHealth = 60 // land mid-previous stage, not zero
+      newHealth = HEALTH.STAGE_RESET
     }
   }
 
@@ -166,16 +171,17 @@ export function computeHealthGain(state) {
   const msSinceLast = Date.now() - last.ts
   const hoursClean = msSinceLast / 3600000
 
-  // Stage thresholds in hours
-  const THRESHOLDS = [0, 72, 168, 336, 720] // 0, 3d, 7d, 14d, 30d
-  const targetStage = THRESHOLDS.reduce((s, t, i) => hoursClean >= t ? i + 1 : s, 1)
+  const targetStage = STAGE_THRESHOLDS_HOURS.reduce(
+    (s, t, i) => hoursClean >= t ? i + 1 : s,
+    1
+  )
 
-  let newHealth = Math.min(state.health + (hoursClean > 0 ? 0.5 : 0), 100)
+  let newHealth = Math.min(state.health + (hoursClean > 0 ? HEALTH.PASSIVE_GAIN : 0), HEALTH.MAX)
   let newStage = state.stage
 
-  if (targetStage > state.stage && newHealth >= 100) {
+  if (targetStage > state.stage && newHealth >= HEALTH.MAX) {
     newStage = Math.min(targetStage, 5)
-    newHealth = 60
+    newHealth = HEALTH.INITIAL
   }
 
   return { health: newHealth, stage: newStage }
