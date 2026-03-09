@@ -101,28 +101,34 @@ export default function Home({ state, update, onCravingSurf }) {
   function logUse() {
     const now = Date.now()
     const isHonestyReward = Math.random() < HONESTY_REWARD_CHANCE
+    const newEvent = { id: now, type: EVENT.USED, ts: now }
 
     if (isHonestyReward) {
-      // Reward honesty — log the event but skip the health penalty
-      const { consecutiveSlips, lastSlipTs } = computeHealthAfterUse(state)
-      update(prev => ({
-        ...prev,
-        events: [...prev.events, { id: now, type: EVENT.USED, ts: now }],
-        consecutiveSlips,
-        lastSlipTs,
-        startedAt: prev.startedAt || now,
-      }))
+      // Reward honesty — log the event but skip the health penalty.
+      // computeHealthAfterUse runs inside the callback to avoid stale state.
+      update(prev => {
+        const { consecutiveSlips, lastSlipTs } = computeHealthAfterUse(prev)
+        return {
+          ...prev,
+          events: [...prev.events, newEvent],
+          consecutiveSlips,
+          lastSlipTs,
+          startedAt: prev.startedAt || now,
+        }
+      })
       showCreatureMsg(pick(HONESTY_MESSAGES))
     } else {
       setReacting(true)
       setTimeout(() => setReacting(false), TIMING.REACT_ANIMATION)
-      const healthDelta = computeHealthAfterUse(state)
-      update(prev => ({
-        ...prev,
-        events: [...prev.events, { id: now, type: EVENT.USED, ts: now }],
-        ...healthDelta,
-        startedAt: prev.startedAt || now,
-      }))
+      update(prev => {
+        const healthDelta = computeHealthAfterUse(prev)
+        return {
+          ...prev,
+          events: [...prev.events, newEvent],
+          ...healthDelta,
+          startedAt: prev.startedAt || now,
+        }
+      })
     }
   }
 
@@ -136,8 +142,14 @@ export default function Home({ state, update, onCravingSurf }) {
     }))
   }
 
-  // Walk back the most recent resisted log — no extra punishment
+  // Walk back the most recent resisted log — no extra punishment.
+  // Guard with a sync check first so the creature message only fires if there's something to remove.
   function undoLastResisted() {
+    const hasResisted = state.events.some(
+      e => e.type === EVENT.RESISTED || e.type === EVENT.CRAVING_SURFED
+    )
+    if (!hasResisted) return
+
     update(prev => {
       const reversedIdx = [...prev.events].reverse().findIndex(
         e => e.type === EVENT.RESISTED || e.type === EVENT.CRAVING_SURFED

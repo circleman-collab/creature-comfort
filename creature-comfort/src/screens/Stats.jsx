@@ -64,13 +64,13 @@ export default function Stats({ state, onReset }) {
         {tab === 'today' && (
           <div className="stats-panel">
             <div className="stat-row">
-              <div className="stat-card red">
+              <div className="stat-card">
                 <div className="sc-label">Used</div>
-                <div className="sc-value">{todayStats.uses}</div>
+                <div className="sc-value red">{todayStats.uses}</div>
               </div>
-              <div className="stat-card green">
+              <div className="stat-card">
                 <div className="sc-label">Resisted</div>
-                <div className="sc-value">{todayStats.resisted}</div>
+                <div className="sc-value green">{todayStats.resisted}</div>
               </div>
             </div>
 

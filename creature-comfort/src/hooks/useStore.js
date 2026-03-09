@@ -165,12 +165,10 @@ export function computeHealthAfterUse(state) {
 }
 
 // Compute passive health and stage gains over time (call periodically).
-// Stage advances purely on elapsed clean time from startedAt (or since last use).
-// Health fills independently as a visual within each stage.
+// Stage advances purely on elapsed journey time from startedAt — slips do not
+// reset the stage clock. Health fills independently as a visual within each stage.
 export function computeHealthGain(state) {
-  // Use last use as baseline; if never used, count from journey start
-  const last = getLastUse(state.events)
-  const baseline = last ? last.ts : state.startedAt
+  const baseline = state.startedAt
   if (!baseline) return state
 
   const hoursClean = (Date.now() - baseline) / 3600000
