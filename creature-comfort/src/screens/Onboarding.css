@@ -1,0 +1,158 @@
+.onboarding {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 24px;
+  padding-top: calc(32px + var(--safe-top));
+  padding-bottom: calc(32px + var(--safe-bottom));
+  z-index: 1000;
+}
+
+.onboarding-inner {
+  width: 100%;
+  max-width: 380px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.ob-step-label {
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  color: var(--text-muted);
+  margin-bottom: 32px;
+}
+
+.ob-block {
+  flex: 1;
+}
+
+.ob-title {
+  font-family: var(--pixel);
+  font-size: clamp(22px, 7vw, 32px);
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--text);
+  margin-bottom: 20px;
+  letter-spacing: -0.01em;
+}
+
+.ob-body {
+  font-size: 16px;
+  line-height: 1.7;
+  color: var(--text-dim);
+  margin-bottom: 28px;
+}
+
+.ob-body em {
+  color: var(--accent);
+  font-style: italic;
+}
+
+.ob-input {
+  width: 100%;
+  background: var(--surface);
+  border: 2px solid var(--border-hi);
+  color: var(--text);
+  font-family: var(--pixel);
+  font-size: 13px;
+  padding: 14px 16px;
+  outline: none;
+  transition: border-color 0.2s;
+  resize: none;
+}
+
+.ob-input:focus {
+  border-color: var(--accent-dim);
+}
+
+.ob-input::placeholder {
+  color: var(--text-muted);
+}
+
+.ob-textarea {
+  height: 100px;
+  line-height: 1.6;
+}
+
+.ob-char-count {
+  font-size: 9px;
+  color: var(--text-muted);
+  text-align: right;
+  margin-top: 6px;
+}
+
+.ob-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ob-option {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  padding: 14px 16px;
+  background: var(--surface);
+  border: 2px solid var(--border-hi);
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+  text-align: left;
+}
+
+.ob-option.selected {
+  border-color: var(--accent-dim);
+  color: var(--text);
+}
+
+.ob-option-label {
+  font-family: var(--pixel);
+  font-size: 11px;
+  letter-spacing: 0.05em;
+}
+
+.ob-option-sub {
+  font-size: 13px;
+  color: var(--text-dim);
+  font-family: var(--prose);
+}
+
+.ob-next {
+  width: 100%;
+  margin-top: 32px;
+  padding: 16px;
+  background: var(--surface);
+  border: 2px solid var(--border-hi);
+  color: var(--text-muted);
+  font-family: var(--pixel);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s, background 0.2s;
+}
+
+.ob-next.ready {
+  border-color: var(--accent-dim);
+  color: var(--accent);
+}
+
+.ob-next.ready:active {
+  background: var(--accent-dim);
+}
+
+.ob-back {
+  margin-top: 14px;
+  font-size: 10px;
+  color: var(--text-muted);
+  letter-spacing: 0.1em;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px 0;
+  display: block;
+}

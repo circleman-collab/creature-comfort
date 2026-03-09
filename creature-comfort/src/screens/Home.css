@@ -1,0 +1,169 @@
+.home {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding-bottom: calc(60px + var(--safe-bottom));
+  overflow: hidden;
+}
+
+.home-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 16px 20px 8px;
+  flex-shrink: 0;
+}
+
+.home-creature-name {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  color: var(--accent);
+  text-transform: uppercase;
+}
+
+.home-stage-label {
+  font-size: 9px;
+  letter-spacing: 0.15em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+/* Canvas */
+.home-canvas-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.home-canvas-wrap canvas {
+  display: block;
+}
+
+.health-bar-wrap {
+  width: 256px;
+  padding: 6px 0 2px;
+}
+
+.health-bar {
+  height: 3px;
+  background: var(--border);
+  width: 100%;
+}
+
+.health-bar-fill {
+  height: 100%;
+  transition: width 1s ease, background 1s ease;
+}
+
+/* Intention whisper */
+.intention-whisper {
+  min-height: 36px;
+  padding: 0 28px;
+  text-align: center;
+  font-size: 14px;
+  color: var(--text-dim);
+  line-height: 1.5;
+  opacity: 0;
+  transition: opacity 0.8s ease;
+  flex-shrink: 0;
+  font-style: italic;
+}
+
+.intention-whisper.visible {
+  opacity: 1;
+}
+
+/* Timer */
+.home-timer {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0 20px;
+}
+
+.timer-label {
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.timer-value {
+  font-size: clamp(36px, 11vw, 52px);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--text);
+  line-height: 1;
+}
+
+.timer-sub {
+  margin-top: 8px;
+  font-size: 9px;
+  color: var(--text-muted);
+  letter-spacing: 0.1em;
+}
+
+/* Actions */
+.home-actions {
+  padding: 0 20px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.btn-craving {
+  width: 100%;
+  padding: 16px 20px;
+  background: var(--surface);
+  border: 2px solid var(--accent-dim);
+  color: var(--text);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  transition: background 0.15s;
+}
+
+.btn-craving:active { background: var(--accent-dim); }
+
+.btn-craving-main {
+  font-family: var(--pixel);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  color: var(--accent);
+}
+
+.btn-craving-sub {
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+.home-actions-row {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-used, .btn-resisted {
+  flex: 1;
+  padding: 14px 10px;
+  background: var(--surface);
+  border: 2px solid var(--border-hi);
+  font-family: var(--pixel);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: background 0.1s, border-color 0.1s;
+}
+
+.btn-used { color: var(--red); border-color: var(--red-dim); }
+.btn-used:active { background: var(--red-dim); }
+
+.btn-resisted { color: var(--text-dim); }
+.btn-resisted:active { background: var(--border); }

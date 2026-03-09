@@ -1,0 +1,52 @@
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: calc(60px + var(--safe-bottom));
+  padding-bottom: var(--safe-bottom);
+  background: var(--bg);
+  border-top: 1px solid var(--border);
+  display: flex;
+  z-index: 100;
+}
+
+.bnav-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px 4px;
+  transition: opacity 0.15s;
+}
+
+.bnav-icon {
+  font-size: 18px;
+  line-height: 1;
+  filter: grayscale(1);
+  opacity: 0.3;
+  transition: filter 0.2s, opacity 0.2s;
+}
+
+.bnav-label {
+  font-family: var(--pixel);
+  font-size: 8px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  transition: color 0.2s;
+}
+
+.bnav-btn.active .bnav-icon {
+  filter: none;
+  opacity: 1;
+}
+
+.bnav-btn.active .bnav-label {
+  color: var(--accent);
+}

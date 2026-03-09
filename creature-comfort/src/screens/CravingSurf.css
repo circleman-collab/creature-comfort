@@ -1,0 +1,135 @@
+.craving-surf {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  z-index: 500;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 24px;
+  padding-top: calc(20px + var(--safe-top));
+  padding-bottom: calc(20px + var(--safe-bottom));
+  overflow-y: auto;
+}
+
+.surf-close {
+  position: absolute;
+  top: calc(16px + var(--safe-top));
+  right: 20px;
+  font-size: 14px;
+  color: var(--text-muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+}
+
+.surf-header {
+  text-align: center;
+  margin-bottom: 16px;
+  margin-top: 8px;
+}
+
+.surf-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: 0.04em;
+  margin-bottom: 6px;
+}
+
+.surf-subtitle {
+  font-size: 15px;
+  color: var(--text-dim);
+}
+
+.surf-canvas-wrap {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 16px;
+  transform: scale(0.75);
+  transform-origin: center top;
+}
+
+.surf-ring-wrap {
+  position: relative;
+  width: 112px;
+  height: 112px;
+  margin-bottom: 16px;
+  flex-shrink: 0;
+}
+
+.surf-ring-inner {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.surf-seconds {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1;
+}
+
+.surf-phase-label {
+  font-size: 12px;
+  color: var(--text-dim);
+  font-style: italic;
+}
+
+.surf-intention {
+  font-size: 14px;
+  color: var(--text-dim);
+  font-style: italic;
+  text-align: center;
+  padding: 0 16px;
+  line-height: 1.6;
+  margin-bottom: 12px;
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.surf-actions {
+  width: 100%;
+  flex-shrink: 0;
+}
+
+/* Done state */
+.surf-done {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  width: 100%;
+}
+
+.surf-done-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 14px;
+  letter-spacing: 0.04em;
+}
+
+.surf-done-body {
+  font-size: 16px;
+  color: var(--text-dim);
+  line-height: 1.7;
+  text-align: center;
+  padding: 0 8px;
+  margin-bottom: 16px;
+}
+
+.surf-done-intention {
+  font-size: 14px;
+  color: var(--text-muted);
+  font-style: italic;
+  text-align: center;
+  flex: 1;
+}

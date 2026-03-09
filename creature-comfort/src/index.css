@@ -1,0 +1,93 @@
+:root {
+  --bg:          #0d1a0f;
+  --bg2:         #111f13;
+  --surface:     #162119;
+  --border:      #1e3022;
+  --border-hi:   #2a4530;
+  --text:        #d4e8c2;
+  --text-dim:    #6a8f5a;
+  --text-muted:  #2e4a30;
+  --accent:      #7ec850;
+  --accent-dim:  #3a6e22;
+  --gold:        #c8a84b;
+  --gold-dim:    #6b521a;
+  --red:         #c0452b;
+  --red-dim:     #6b2218;
+  --ember:       #e87c3e;
+  --pixel:       'Silkscreen', monospace;
+  --prose:       'Crimson Pro', serif;
+  --safe-top:    env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+html, body, #root {
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--pixel);
+  -webkit-font-smoothing: none;
+  image-rendering: pixelated;
+  overflow: hidden;
+}
+
+/* Pixel rendering everywhere */
+canvas { image-rendering: pixelated; image-rendering: crisp-edges; }
+
+/* Scrollable containers */
+.scroll { overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; }
+.scroll::-webkit-scrollbar { width: 3px; }
+.scroll::-webkit-scrollbar-track { background: transparent; }
+.scroll::-webkit-scrollbar-thumb { background: var(--border-hi); }
+
+/* Typography */
+.pixel { font-family: var(--pixel); }
+.prose { font-family: var(--prose); font-weight: 300; }
+
+/* Pixel border utility */
+.px-border {
+  border: 2px solid var(--border-hi);
+  box-shadow: inset 0 0 0 1px var(--border);
+}
+
+/* Button base */
+button {
+  font-family: var(--pixel);
+  cursor: pointer;
+  border: none;
+  background: none;
+  color: inherit;
+}
+
+/* Pixel button */
+.btn-pixel {
+  display: block;
+  width: 100%;
+  padding: 14px 20px;
+  background: var(--surface);
+  border: 2px solid var(--border-hi);
+  color: var(--text);
+  font-family: var(--pixel);
+  font-size: 10px;
+  letter-spacing: 0.05em;
+  text-align: center;
+  cursor: pointer;
+  transition: background 0.1s, border-color 0.1s;
+  position: relative;
+}
+.btn-pixel:active { background: var(--border); transform: translateY(1px); }
+.btn-pixel.accent { border-color: var(--accent-dim); color: var(--accent); }
+.btn-pixel.accent:active { background: var(--accent-dim); }
+.btn-pixel.danger { border-color: var(--red-dim); color: var(--red); }
+
+/* Grain overlay */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  opacity: 0.35;
+}
