@@ -44,7 +44,21 @@ export default function Home({ state, update, onCravingSurf }) {
   const [reacting, setReacting] = useState(false)
   const [bubbleMsg, setBubbleMsg] = useState(null)
   const [creatureMsg, setCreatureMsg] = useState(null)
+  const [debugMode, setDebugMode] = useState(false)
   const creatureMsgTimerRef = useRef(null)
+  const tapCountRef = useRef(0)
+  const tapTimerRef = useRef(null)
+
+  function handleNameTap() {
+    tapCountRef.current++
+    clearTimeout(tapTimerRef.current)
+    if (tapCountRef.current >= 5) {
+      tapCountRef.current = 0
+      setDebugMode(prev => !prev)
+    } else {
+      tapTimerRef.current = setTimeout(() => { tapCountRef.current = 0 }, 1500)
+    }
+  }
 
   // Live timer
   useEffect(() => {
@@ -178,7 +192,7 @@ export default function Home({ state, update, onCravingSurf }) {
     <div className="home">
       {/* Header */}
       <div className="home-header">
-        <div className="home-creature-name">{state.creatureName}</div>
+        <div className="home-creature-name" onClick={handleNameTap}>{state.creatureName}</div>
         <div className="home-stage-label">{STAGE_NAMES[state.stage]}</div>
       </div>
 
@@ -240,6 +254,55 @@ export default function Home({ state, update, onCravingSurf }) {
           ↩ I lied about resisting
         </button>
       </div>
+
+      {/* Debug panel — activated by tapping the creature name 5× */}
+      {debugMode && (
+        <div className="debug-panel">
+          <div className="debug-header">
+            <span>DEBUG</span>
+            <button className="debug-close" onClick={() => setDebugMode(false)}>✕</button>
+          </div>
+
+          <div className="debug-row">
+            <span className="debug-label">Stage</span>
+            <div className="debug-controls">
+              <button onClick={() => update(p => ({ ...p, stage: Math.max(1, p.stage - 1) }))}>←</button>
+              <span className="debug-val">{state.stage} / 5</span>
+              <button onClick={() => update(p => ({ ...p, stage: Math.min(5, p.stage + 1) }))}>→</button>
+            </div>
+          </div>
+
+          <div className="debug-row">
+            <span className="debug-label">Health</span>
+            <div className="debug-controls">
+              <button onClick={() => update(p => ({ ...p, health: Math.max(0, p.health - 10) }))}>←</button>
+              <span className="debug-val">{Math.round(state.health)}</span>
+              <button onClick={() => update(p => ({ ...p, health: Math.min(100, p.health + 10) }))}>→</button>
+            </div>
+          </div>
+
+          <div className="debug-row">
+            <span className="debug-label">Journey</span>
+            <div className="debug-controls">
+              <button onClick={() => update(p => ({ ...p, startedAt: (p.startedAt || Date.now()) - 86400000 }))}>-1d</button>
+              <span className="debug-val">{daysSinceStart}d in</span>
+              <button onClick={() => update(p => ({ ...p, startedAt: Math.min((p.startedAt || Date.now()) + 86400000, Date.now()) }))}>+1d</button>
+            </div>
+          </div>
+
+          <div className="debug-actions">
+            <button className="debug-btn" onClick={() => {
+              const msgs = SPEECH_BY_STAGE[state.stage] || []
+              if (msgs.length > 0) {
+                setBubbleMsg(pick(msgs))
+                setTimeout(() => setBubbleMsg(null), TIMING.BUBBLE_DISMISS)
+              }
+            }}>bubble</button>
+            <button className="debug-btn" onClick={() => update(p => ({ ...p, health: 30 }))}>wilt</button>
+            <button className="debug-btn" onClick={() => update(p => ({ ...p, health: 100 }))}>full hp</button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
