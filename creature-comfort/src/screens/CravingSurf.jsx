@@ -94,8 +94,10 @@ export default function CravingSurf({ state, update, onClose }) {
 
       {!done ? (
         <>
-          <div className="surf-canvas-wrap">
-            <CreatureCanvas stage={state.stage} health={surfHealth} />
+          <div className="device-screen-area">
+            <div className="porthole-glass">
+              <CreatureCanvas stage={state.stage} health={surfHealth} />
+            </div>
           </div>
 
           <div className="surf-ring-wrap">
@@ -123,8 +125,10 @@ export default function CravingSurf({ state, update, onClose }) {
         </>
       ) : (
         <div className="surf-done">
-          <div className="surf-canvas-wrap">
-            <CreatureCanvas stage={state.stage} health={Math.min(state.health + 10, HEALTH.MAX)} />
+          <div className="device-screen-area">
+            <div className="porthole-glass">
+              <CreatureCanvas stage={state.stage} health={Math.min(state.health + 10, HEALTH.MAX)} />
+            </div>
           </div>
           <div className="surf-done-title pixel">You made it.</div>
           <div className="surf-done-body prose">

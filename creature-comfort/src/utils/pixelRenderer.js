@@ -283,18 +283,32 @@ export function drawStage5(ctx, health, tick) {
 
 // ── Environment layers ────────────────────────────────────
 
-export function drawEnvironment(ctx, stage, health, tick, stageJustAdvanced = false) {
+function getSkyColors(stage, hour) {
+  const times = {
+    night:   ['#0a0c1a', '#0f1028'],
+    dawn:    ['#1a1030', '#2e1a3a'],
+    morning: ['#1a2848', '#2a4060'],
+    day:     ['#1e3858', '#3a6070'],
+    dusk:    ['#2a1828', '#3a2040'],
+    evening: ['#140e22', '#1e1430'],
+  }
+  let base
+  if (hour >= 22 || hour < 5)  base = times.night
+  else if (hour < 7)            base = times.dawn
+  else if (hour < 10)           base = times.morning
+  else if (hour < 16)           base = times.day
+  else if (hour < 19)           base = times.dusk
+  else                          base = times.evening
+
+  const stageTint = (stage - 1) * 0.04
+  return base
+}
+
+export function drawEnvironment(ctx, stage, health, tick, stageJustAdvanced = false, hour = new Date().getHours()) {
   const wilt = health < HEALTH.WILT_THRESHOLD
 
-  // ── Sky gradient (richer with stage) ─────────────────
-  const skyColors = [
-    ['#0f1225', '#1e2040'],
-    ['#111830', '#22304e'],
-    ['#152840', '#265068'],
-    ['#1c3850', '#346070'],
-    ['#224460', '#4a7888'],
-  ]
-  const [skyTop, skyBot] = skyColors[stage - 1]
+  // ── Sky gradient (time-of-day aware) ─────────────────
+  const [skyTop, skyBot] = getSkyColors(stage, hour)
   const skyGrad = ctx.createLinearGradient(0, 0, 0, 56 * SCALE)
   skyGrad.addColorStop(0, skyTop)
   skyGrad.addColorStop(1, skyBot)
@@ -520,9 +534,9 @@ function dot(ctx, x, y, color) {
 
 // ── Main draw function ────────────────────────────────────
 
-export function drawScene(ctx, stage, health, tick, stageJustAdvanced = false) {
+export function drawScene(ctx, stage, health, tick, stageJustAdvanced = false, hour = new Date().getHours()) {
   ctx.clearRect(0, 0, W * SCALE, H * SCALE)
-  drawEnvironment(ctx, stage, health, tick, stageJustAdvanced)
+  drawEnvironment(ctx, stage, health, tick, stageJustAdvanced, hour)
 
   switch (stage) {
     case 1: drawStage1(ctx, health, tick); break

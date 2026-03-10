@@ -32,25 +32,16 @@
 .device-screen-area {
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: stretch;
+  padding: 0;
   background: var(--bezel);
-  padding: 10px 16px 14px;
   position: relative;
   flex-shrink: 0;
-
-  /* Inset shadow — screen is recessed into the body */
-  box-shadow:
-    inset 0 3px 10px rgba(0,0,0,0.6),
-    inset 0 -1px 4px rgba(0,0,0,0.3);
-
-  /* Panel seams */
-  border-top: 1px solid var(--shell-shadow);
-  border-bottom: 2px solid var(--shell-shadow);
-
-  /* Two-tone plastic lip — GBP screen surround */
   border: 2px solid var(--shell-lo);
   outline: 2px solid #0a0c0b;
   outline-offset: -2px;
+  box-shadow: inset 0 3px 10px rgba(0,0,0,0.6);
+  border-bottom: 2px solid var(--shell-shadow);
 }
 
 /* Screen area inner glow — light bleeding from the world */

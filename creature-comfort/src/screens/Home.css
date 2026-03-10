@@ -46,6 +46,7 @@
 .porthole-glass {
   overflow: hidden;
   position: relative;
+  width: 100%;
   box-shadow: inset 0 2px 8px rgba(0,0,0,0.6);
 }
 
@@ -147,11 +148,12 @@
 .btn-craving {
   width: 100%;
   padding: 15px 20px;
-  background: var(--shell-hi);
-  border: 1px solid var(--shell-shadow);
-  border-top: 1px solid var(--shell-hi);
-  border-bottom: 5px solid var(--shell-shadow);
-  box-shadow: 0 4px 0 var(--shell-shadow);
+  background: #2a3830;
+  border-top: 1px solid #3a4e40;
+  border-left: 1px solid #243028;
+  border-right: 1px solid #243028;
+  border-bottom: 5px solid #0d1512;
+  box-shadow: 0 4px 0 #0d1512, inset 0 1px 0 rgba(255,255,255,0.04);
   color: var(--text);
   cursor: pointer;
   display: flex;
@@ -163,10 +165,10 @@
 }
 
 .btn-craving:active {
+  background: #222e28;
   transform: translateY(3px);
   border-bottom-width: 2px;
-  box-shadow: 0 1px 0 var(--shell-shadow);
-  background: var(--shell);
+  box-shadow: 0 1px 0 #0d1512;
 }
 
 .btn-craving-main {
@@ -190,11 +192,12 @@
 .btn-used, .btn-resisted {
   flex: 1;
   padding: 13px 10px;
-  background: var(--shell-hi);
-  border: 1px solid var(--shell-shadow);
-  border-top: 1px solid var(--shell-hi);
-  border-bottom: 5px solid var(--shell-shadow);
-  box-shadow: 0 4px 0 var(--shell-shadow);
+  background: #2a3830;
+  border-top: 1px solid #3a4e40;
+  border-left: 1px solid #243028;
+  border-right: 1px solid #243028;
+  border-bottom: 5px solid #0d1512;
+  box-shadow: 0 4px 0 #0d1512, inset 0 1px 0 rgba(255,255,255,0.04);
   font-family: var(--pixel);
   font-size: 10px;
   letter-spacing: 0.06em;
@@ -205,13 +208,12 @@
 
 .btn-used {
   color: var(--red);
-  border-left: 1px solid var(--red-dim);
 }
 .btn-used:active {
+  background: #222e28;
   transform: translateY(3px);
   border-bottom-width: 2px;
-  box-shadow: 0 1px 0 var(--shell-shadow);
-  background: var(--shell);
+  box-shadow: 0 1px 0 #0d1512;
 }
 
 .btn-resisted {
@@ -222,10 +224,10 @@
   gap: 3px;
 }
 .btn-resisted:active {
+  background: #222e28;
   transform: translateY(3px);
   border-bottom-width: 2px;
-  box-shadow: 0 1px 0 var(--shell-shadow);
-  background: var(--shell);
+  box-shadow: 0 1px 0 #0d1512;
 }
 
 .btn-friction {
@@ -294,14 +296,13 @@
   bottom: calc(60px + var(--safe-bottom));
   left: 0;
   right: 0;
-  background: var(--shell-lo);
+  background: #0f1a12;
   border-top: 2px solid var(--gold-dim);
   padding: 10px 16px 12px;
-  z-index: 200;
+  z-index: 1000;
   display: flex;
   flex-direction: column;
   gap: 8px;
-  backdrop-filter: none;
   isolation: isolate;
 }
 

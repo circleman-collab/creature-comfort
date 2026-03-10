@@ -32,7 +32,7 @@ const CreatureCanvas = memo(function CreatureCanvas({ stage, health, stageJustAd
     function loop() {
       if (!running) return
       tickRef.current++
-      drawScene(ctx, stage, health, tickRef.current, stageAdvancedRef.current)
+      drawScene(ctx, stage, health, tickRef.current, stageAdvancedRef.current, new Date().getHours())
       rafRef.current = requestAnimationFrame(loop)
     }
 
@@ -49,8 +49,8 @@ const CreatureCanvas = memo(function CreatureCanvas({ stage, health, stageJustAd
       width={CANVAS_W}
       height={CANVAS_H}
       style={{
-        width: CANVAS_W,
-        height: CANVAS_H,
+        width: '100%',
+        height: 'auto',
         display: 'block',
         imageRendering: 'pixelated',
       }}
