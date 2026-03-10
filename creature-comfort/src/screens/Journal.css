@@ -27,7 +27,7 @@
 
 .journal-entries {
   flex: 1;
-  padding-bottom: calc(60px + var(--safe-bottom));
+  padding-bottom: 20px;
 }
 
 /* Empty state */
