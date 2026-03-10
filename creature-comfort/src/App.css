@@ -24,6 +24,11 @@
   flex-direction: column;
 }
 
+/* Lift overflow during journal 3D flip so preserve-3d isn't clipped */
+.app-content.journal-flipping {
+  overflow: visible;
+}
+
 /* ── Screen area — bezel + porthole ─────────────────────
    The near-black bezel surrounds the porthole.
    Contrast is the whole point — this is where the

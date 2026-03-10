@@ -116,14 +116,16 @@ export default function App() {
           <Intentions state={state} update={update} />
         )}
         {tab === 'journal' && (
-          <Journal state={state} />
+          <Journal state={state} update={update} />
         )}
         {tab === 'stats' && (
           <Stats state={state} update={update} onReset={reset} />
         )}
       </div>
 
-      <BottomNav active={tab} onChange={setTab} />
+      <div className="device-nav-area">
+        <BottomNav active={tab} onChange={setTab} />
+      </div>
     </div>
   )
 }

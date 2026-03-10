@@ -234,13 +234,13 @@ export const IDLE_BUBBLES = [
   // Stage 1 — pre-verbal, lowercase
   ['still here.', 'roots growing.', '...', 'warm.', 'something is happening.'],
   // Stage 2 — fragmented, wonder-filled
-  ['i can see so much.', 'the sky is very large.', "i'm working on something.", 'you came back.', "we're both figuring this out."],
+  ['i can see so much.', 'the sky is very large.', "i'm working on something.", 'you came back.', "we're both figuring this out.", "i've been writing things down."],
   // Stage 3 — confident, a little funny
-  ['the forest feels different today.', 'i hopped. did you see?', 'still here. still growing.', 'that one was hard. i know.', "i'm getting better at this."],
+  ['the forest feels different today.', 'i hopped. did you see?', 'still here. still growing.', 'that one was hard. i know.', "i'm getting better at this.", 'i keep a record too, you know.'],
   // Stage 4 — existential, warm
-  ['something is coming through me.', 'the fur is soft, for what it\'s worth.', "i've been thinking about the tail.", 'still becoming.', 'i notice every day.'],
+  ['something is coming through me.', 'the fur is soft, for what it\'s worth.', "i've been thinking about the tail.", 'still becoming.', 'i notice every day.', "i wonder if they'll ever look."],
   // Stage 5 — spacious, jovial
-  ['look at us.', 'the fireflies are out.', 'still here. still changing.', "it's a good day to exist.", 'i glow a little now. no big deal.'],
+  ['look at us.', 'the fireflies are out.', 'still here. still changing.', "it's a good day to exist.", 'i glow a little now. no big deal.', 'it was always there.'],
 ]
 
 // ── Helper ────────────────────────────────────────────────

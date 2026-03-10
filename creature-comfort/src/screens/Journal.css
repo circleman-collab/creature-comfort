@@ -1,9 +1,48 @@
+/* ── Journal shell ───────────────────────────────────────── */
 .journal {
   height: 100%;
   display: flex;
   flex-direction: column;
+  perspective: 1200px;
+  overflow: hidden;
 }
 
+/* ── Book — the flipping object ──────────────────────────── */
+.journal-book {
+  flex: 1;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 600ms cubic-bezier(0.4, 0, 0.2, 1);
+  min-height: 0;
+}
+
+.journal-book.flipped {
+  transform: rotateY(180deg);
+}
+
+/* ── Sides — front and back of the book ─────────────────── */
+.journal-side {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.journal-side-user {
+  transform: rotateY(0deg);
+  background: var(--bg);
+}
+
+.journal-side-creature {
+  transform: rotateY(180deg);
+  /* Slightly different paper — the creature's pages feel older */
+  background: var(--bg2);
+}
+
+/* ── Header ──────────────────────────────────────────────── */
 .journal-header {
   padding: 20px 20px 14px;
   border-bottom: 1px solid var(--border);
@@ -11,10 +50,20 @@
 }
 
 .journal-title {
+  font-size: 18px;
+  color: var(--text-dim);
+  font-style: italic;
+  line-height: 1.3;
+}
+
+/* Creature side title — pixel font, accent color */
+.journal-side-creature .journal-title {
+  font-family: var(--pixel);
   font-size: 11px;
   letter-spacing: 0.12em;
   color: var(--accent);
   text-transform: uppercase;
+  font-style: normal;
 }
 
 .journal-subtitle {
@@ -23,10 +72,69 @@
   color: var(--text-muted);
   text-transform: uppercase;
   margin-top: 2px;
+  font-family: var(--pixel);
 }
 
+/* ── Compose area (user side only) ───────────────────────── */
+.journal-compose {
+  padding: 14px 20px 12px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.journal-input {
+  width: 100%;
+  min-height: 88px;
+  background: transparent;
+  border: none;
+  resize: none;
+  font-size: 16px;
+  font-weight: 300;
+  color: var(--text);
+  line-height: 1.75;
+  outline: none;
+  caret-color: var(--accent);
+  -webkit-font-smoothing: antialiased;
+}
+
+.journal-input::placeholder {
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.journal-save {
+  align-self: flex-end;
+  font-family: var(--pixel);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  color: var(--text-muted);
+  padding: 5px 10px;
+  border: 1px solid var(--border);
+  background: none;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s, opacity 0.15s;
+  text-transform: lowercase;
+}
+
+.journal-save:not(:disabled):active {
+  color: var(--accent);
+  border-color: var(--accent-dim);
+}
+
+.journal-save:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+/* ── Entries list ────────────────────────────────────────── */
 .journal-entries {
   flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  min-height: 0;
   padding-bottom: 20px;
 }
 
@@ -63,7 +171,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
   gap: 8px;
 }
 
@@ -99,12 +207,23 @@
   padding: 1px 5px;
 }
 
-.je-text {
+/* User entries — upright, direct, the user's own voice */
+.je-text-user {
+  font-style: normal;
   font-size: 16px;
+  line-height: 1.8;
+  color: var(--text);
+  white-space: pre-line;
+}
+
+/* Creature entries — italic, slightly dimmer, more cramped */
+/* Written for no one. That's why it reads differently. */
+.je-text-creature {
+  font-style: italic;
+  font-size: 15px;
   line-height: 1.75;
   color: var(--text-dim);
   white-space: pre-line;
-  font-style: italic;
   letter-spacing: 0.01em;
 }
 
@@ -112,4 +231,50 @@
   height: 1px;
   background: var(--border);
   margin: 20px 0 0;
+}
+
+/* ── Discovery tab ───────────────────────────────────────── */
+/* A thin vertical tab on the edge of the journal.
+   No label. Just presence. You notice it or you don't. */
+.journal-tab {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 10px;
+  height: 56px;
+  background: var(--border-hi);
+  cursor: pointer;
+  transition: background 0.2s, width 0.15s;
+  z-index: 10;
+}
+
+.journal-tab:active {
+  background: var(--accent-dim);
+  width: 8px;
+}
+
+.journal-tab-right {
+  right: 0;
+  border-radius: 3px 0 0 3px;
+}
+
+.journal-tab-left {
+  left: 0;
+  border-radius: 0 3px 3px 0;
+}
+
+/* Pulse — draws quiet attention after first entry is saved */
+@keyframes tab-pulse {
+  0%, 100% {
+    background: var(--border-hi);
+    width: 10px;
+  }
+  50% {
+    background: var(--accent-dim);
+    width: 13px;
+  }
+}
+
+.journal-tab-right.pulse {
+  animation: tab-pulse 3s ease-in-out infinite;
 }

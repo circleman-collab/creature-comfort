@@ -17,6 +17,8 @@ const DEFAULT_STATE = {
   // Journal
   journalEntries: [],    // [{id, ts, stage, trigger, text}]
   journalTriggered: [],  // keys like '1_event_slip', 'evolution_3', 'week_1', 'day_1'
+  userJournalEntries: [],      // [{id, ts, text}]
+  hasWrittenFirstEntry: false,
 
   // Creature state
   stage: 1,          // 1–5
