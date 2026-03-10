@@ -34,9 +34,20 @@ export default function Home({ state, update, onCravingSurf }) {
   const [bubbleMsg, setBubbleMsg] = useState(null)
   const [creatureMsg, setCreatureMsg] = useState(null)
   const [debugMode, setDebugMode] = useState(false)
+  const [stageJustAdvanced, setStageJustAdvanced] = useState(false)
+  const prevStageRef = useRef(state.stage)
   const creatureMsgTimerRef = useRef(null)
   const tapCountRef = useRef(0)
   const tapTimerRef = useRef(null)
+
+  // Detect stage advance for bonus bird in environment
+  useEffect(() => {
+    if (state.stage > prevStageRef.current) {
+      setStageJustAdvanced(true)
+      setTimeout(() => setStageJustAdvanced(false), 8000)
+    }
+    prevStageRef.current = state.stage
+  }, [state.stage])
 
   function handleNameTap() {
     tapCountRef.current++
@@ -221,12 +232,16 @@ export default function Home({ state, update, onCravingSurf }) {
         <div className="home-stage-label">{STAGE_NAMES[state.stage]}</div>
       </div>
 
-      {/* Canvas + speech bubble */}
-      <div className={`home-canvas-wrap ${reacting ? 'reacting' : ''}`}>
+      {/* Porthole + canvas */}
+      <div className="home-canvas-wrap">
         <div className={`creature-bubble ${bubbleMsg ? 'visible' : ''}`}>
           {bubbleMsg}
         </div>
-        <CreatureCanvas stage={state.stage} health={state.health} />
+        <div className="porthole-frame">
+          <div className="porthole-glass">
+            <CreatureCanvas stage={state.stage} health={state.health} stageJustAdvanced={stageJustAdvanced} />
+          </div>
+        </div>
         <div className="health-bar-wrap">
           <div className="health-bar">
             <div

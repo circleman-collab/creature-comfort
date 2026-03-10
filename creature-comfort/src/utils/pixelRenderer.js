@@ -3,7 +3,9 @@
 
 import { HEALTH } from '../constants'
 
-export const SCALE = 4 // renders at 256x256 display
+export const SCALE = 4 // renders at 256x384 display
+export const W = 64
+export const H = 96
 
 // ── Palette ──────────────────────────────────────────────
 export const C = {
@@ -231,7 +233,7 @@ export function drawStage5(ctx, health, tick) {
   grad.addColorStop(0, `rgba(200, 255, 100, ${auraAlpha})`)
   grad.addColorStop(1, 'rgba(200,255,100,0)')
   ctx.fillStyle = grad
-  ctx.fillRect(0, 0, 64*SCALE, 64*SCALE)
+  ctx.fillRect(0, 0, W * SCALE, H * SCALE)
   ctx.restore()
 
   // Tail (bushy)
@@ -281,37 +283,49 @@ export function drawStage5(ctx, health, tick) {
 
 // ── Environment layers ────────────────────────────────────
 
-export function drawEnvironment(ctx, stage, health, tick) {
-  const W = 64, H = 64
+export function drawEnvironment(ctx, stage, health, tick, stageJustAdvanced = false) {
   const wilt = health < HEALTH.WILT_THRESHOLD
 
-  // Sky gradient (gets lighter/richer with stage)
+  // ── Sky gradient (richer with stage) ─────────────────
   const skyColors = [
-    ['#0d1a0f', '#0d1a0f'],  // s1: night
-    ['#0d1a0f', '#111f13'],  // s2
-    ['#111f13', '#162a18'],  // s3: dawn
-    ['#162a18', '#1e3820'],  // s4
-    ['#1e3820', '#264e28'],  // s5: deep forest
+    ['#0a1209', '#0d1a0f'],  // s1: deep night
+    ['#0d1a0f', '#111f13'],  // s2: late dusk
+    ['#0f1e11', '#162a18'],  // s3: early dawn
+    ['#121f14', '#1e3820'],  // s4: morning
+    ['#162318', '#264e28'],  // s5: deep forest day
   ]
   const [skyTop, skyBot] = skyColors[stage - 1]
-  const skyGrad = ctx.createLinearGradient(0, 0, 0, H * SCALE)
+  const skyGrad = ctx.createLinearGradient(0, 0, 0, 56 * SCALE)
   skyGrad.addColorStop(0, skyTop)
   skyGrad.addColorStop(1, skyBot)
   ctx.fillStyle = skyGrad
-  ctx.fillRect(0, 0, W * SCALE, H * SCALE)
+  ctx.fillRect(0, 0, W * SCALE, 56 * SCALE)
 
-  // Ground
+  // ── Ground fill (below horizon) ───────────────────────
+  ctx.fillStyle = C.b1
+  ctx.fillRect(0, 56 * SCALE, W * SCALE, (H - 56) * SCALE)
+
+  // ── Clouds ─────────────────────────────────────────────
+  if (!wilt) {
+    const cloudAlpha = [0.12, 0.18, 0.22, 0.28, 0.32][stage - 1]
+    drawClouds(ctx, tick, cloudAlpha, stageJustAdvanced)
+  }
+
+  // ── Horizon line (sky meets earth) ────────────────────
+  // Subtle lighter band at y=55 — the seam between worlds
+  const horizonCol = wilt ? '#2a1a0a' : '#1e3a1e'
+  fill(ctx, Array.from({length: W}, (_, x) => [x, 55]), horizonCol)
+
+  // ── Ground surface ────────────────────────────────────
   const groundY = 56
-  fill(ctx, Array.from({length: W}, (_, x) => [x, groundY]), wilt ? C.b2 : C.g2)
+  fill(ctx, Array.from({length: W}, (_, x) => [x, groundY]),   wilt ? C.b2 : C.g2)
   fill(ctx, Array.from({length: W}, (_, x) => [x, groundY+1]), wilt ? C.b1 : C.g1)
   fill(ctx, Array.from({length: W}, (_, x) => [x, groundY+2]), C.b1)
-  fill(ctx, Array.from({length: W}, (_, x) => [x, groundY+3]), C.b1)
-  fill(ctx, Array.from({length: W}, (_, x) => [x, groundY+4]), C.b1)
-  fill(ctx, Array.from({length: W}, (_, x) => [x, groundY+5]), C.b1)
-  fill(ctx, Array.from({length: W}, (_, x) => [x, groundY+6]), C.b1)
-  fill(ctx, Array.from({length: W}, (_, x) => [x, groundY+7]), C.b1)
+  for (let dy = 3; dy <= H - groundY - 1; dy++) {
+    fill(ctx, Array.from({length: W}, (_, x) => [x, groundY + dy]), C.b1)
+  }
 
-  // Grass tufts (stage 2+)
+  // ── Grass tufts (stage 2+) ────────────────────────────
   if (stage >= 2) {
     const grassCol = wilt ? C.w3 : C.g3
     const tufts = [[5,55],[8,55],[12,55],[18,55],[45,55],[50,55],[55,55],[60,55]]
@@ -319,26 +333,25 @@ export function drawEnvironment(ctx, stage, health, tick) {
     if (!wilt) fill(ctx, [[6,54],[7,54],[11,54],[13,54],[46,54],[51,54],[56,54],[59,54]], C.g4)
   }
 
-  // Wildflowers (stage 3+)
+  // ── Wildflowers (stage 3+) ────────────────────────────
   if (stage >= 3 && !wilt) {
-    const flowers = [[7,54],[14,54],[48,54],[57,54]]
-    fill(ctx, flowers, C.a1)
+    fill(ctx, [[7,54],[14,54],[48,54],[57,54]], C.a1)
     fill(ctx, [[7,53],[14,53],[48,53],[57,53]], C.a2)
   }
 
-  // Trees (stage 3+)
+  // ── Trees (stage 3+) ──────────────────────────────────
   if (stage >= 3) {
     drawTree(ctx, 8, 40, wilt, stage)
     drawTree(ctx, 52, 38, wilt, stage)
   }
 
-  // Background trees (stage 4+)
+  // ── Background trees (stage 4+) ───────────────────────
   if (stage >= 4) {
     drawTree(ctx, 2, 46, wilt, stage, true)
     drawTree(ctx, 58, 44, wilt, stage, true)
   }
 
-  // Fireflies (stage 5)
+  // ── Fireflies (stage 5) ───────────────────────────────
   if (stage >= 5) {
     const ffPositions = [
       [15 + Math.floor(Math.sin(tick/40)*3), 35 + Math.floor(Math.cos(tick/50)*2)],
@@ -355,14 +368,111 @@ export function drawEnvironment(ctx, stage, health, tick) {
     })
   }
 
-  // Ash/smoke overlay for wilt
+  // ── Ambient: bird (stage 2+, no wilt) ────────────────
+  if (stage >= 2 && !wilt) {
+    drawBird(ctx, tick, false)
+    // Bonus bird on stage advance
+    if (stageJustAdvanced) drawBird(ctx, tick + 180, true)
+  }
+
+  // ── Ambient: falling leaf (stage 3+, no wilt) ────────
+  if (stage >= 3 && !wilt) {
+    drawLeaf(ctx, tick)
+  }
+
+  // ── Wilt: rain ────────────────────────────────────────
   if (wilt) {
+    drawRain(ctx, tick)
     ctx.save()
     ctx.globalAlpha = 0.15
     ctx.fillStyle = '#4a3010'
     ctx.fillRect(0, 0, W * SCALE, H * SCALE)
     ctx.restore()
   }
+}
+
+// ── Clouds ────────────────────────────────────────────────
+// Three clouds, each a cluster of pixel rects drifting at different speeds
+function drawClouds(ctx, tick, alpha, stageJustAdvanced) {
+  ctx.save()
+  ctx.globalAlpha = stageJustAdvanced ? Math.min(alpha * 1.8, 0.5) : alpha
+
+  const clouds = [
+    { shape: [[0,0],[1,0],[2,0],[3,0],[1,-1],[2,-1]], speed: 0.012, offset: 0,  y: 8  },
+    { shape: [[0,0],[1,0],[2,0],[3,0],[4,0],[1,-1],[2,-1],[3,-1]], speed: 0.007, offset: 25, y: 14 },
+    { shape: [[0,0],[1,0],[2,0],[1,-1]], speed: 0.018, offset: 45, y: 6  },
+  ]
+
+  clouds.forEach(({ shape, speed, offset, y }) => {
+    const xBase = ((tick * speed + offset) % (W + 10)) - 6
+    ctx.fillStyle = '#c8dfc0'
+    shape.forEach(([dx, dy]) => {
+      const px = Math.floor(xBase + dx)
+      const py = y + dy
+      if (px >= 0 && px < W) {
+        ctx.fillRect(px * SCALE, py * SCALE, SCALE, SCALE)
+      }
+    })
+  })
+
+  ctx.restore()
+}
+
+// ── Bird ──────────────────────────────────────────────────
+// Simple 3-pixel V silhouette crossing the upper sky
+function drawBird(ctx, tick, offset = false) {
+  const cycleLen = 460
+  const startOffset = offset ? 200 : 0
+  const pos = (tick + startOffset) % (cycleLen + W + 10)
+  if (pos > cycleLen) return // bird is off-screen / resting
+
+  const x = Math.floor((pos / cycleLen) * (W + 10)) - 5
+  const y = offset ? 12 : 8
+
+  if (x < 0 || x > W - 2) return
+
+  ctx.fillStyle = '#0a150b'
+  // V shape: two diagonal wings
+  ctx.fillRect((x)   * SCALE, (y)   * SCALE, SCALE, SCALE)
+  ctx.fillRect((x+1) * SCALE, (y+1) * SCALE, SCALE, SCALE)
+  ctx.fillRect((x+2) * SCALE, (y)   * SCALE, SCALE, SCALE)
+}
+
+// ── Falling leaf ──────────────────────────────────────────
+// Diagonal drift: right and down, slow
+function drawLeaf(ctx, tick) {
+  const cycleLen = 600
+  const pos = tick % cycleLen
+  const x = Math.floor((pos / cycleLen) * (W + 8)) - 4
+  const y = Math.floor(10 + (pos / cycleLen) * 30)
+
+  if (x < 0 || x >= W || y >= 55) return
+
+  ctx.fillStyle = C.g4
+  ctx.fillRect(x * SCALE, y * SCALE, SCALE, SCALE)
+  // second pixel trails slightly behind
+  if (x - 1 >= 0) {
+    ctx.save()
+    ctx.globalAlpha = 0.5
+    ctx.fillRect((x - 1) * SCALE, (y - 1) * SCALE, SCALE, SCALE)
+    ctx.restore()
+  }
+}
+
+// ── Rain ──────────────────────────────────────────────────
+// Short vertical streaks, randomized x, drifting downward
+function drawRain(ctx, tick) {
+  ctx.save()
+  ctx.globalAlpha = 0.25
+  ctx.fillStyle = '#6a8870'
+  // Use stable pseudo-random x positions seeded per-streak
+  const streaks = [4, 11, 17, 24, 31, 37, 43, 50, 57, 62]
+  streaks.forEach((sx, i) => {
+    const yOff = (tick * 0.8 + i * 9) % 60
+    const y = Math.floor(yOff)
+    if (y < 54) ctx.fillRect(sx * SCALE, y * SCALE, SCALE, SCALE * 2)
+  })
+  ctx.restore()
 }
 
 function drawTree(ctx, x, baseY, wilt, stage, bg = false) {
@@ -410,9 +520,9 @@ function dot(ctx, x, y, color) {
 
 // ── Main draw function ────────────────────────────────────
 
-export function drawScene(ctx, stage, health, tick) {
-  ctx.clearRect(0, 0, 64 * SCALE, 64 * SCALE)
-  drawEnvironment(ctx, stage, health, tick)
+export function drawScene(ctx, stage, health, tick, stageJustAdvanced = false) {
+  ctx.clearRect(0, 0, W * SCALE, H * SCALE)
+  drawEnvironment(ctx, stage, health, tick, stageJustAdvanced)
 
   switch (stage) {
     case 1: drawStage1(ctx, health, tick); break
