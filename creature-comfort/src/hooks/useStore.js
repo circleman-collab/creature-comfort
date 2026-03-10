@@ -14,6 +14,10 @@ const DEFAULT_STATE = {
   // Events
   events: [], // [{id, type:'used'|'resisted'|'craving_surfed', ts, note}]
 
+  // Journal
+  journalEntries: [],    // [{id, ts, stage, trigger, text}]
+  journalTriggered: [],  // keys like '1_event_slip', 'evolution_3', 'week_1', 'day_1'
+
   // Creature state
   stage: 1,          // 1–5
   health: 100,       // 0–100 within stage

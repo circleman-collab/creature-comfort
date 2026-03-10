@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import CreatureCanvas from '../components/CreatureCanvas'
 import { EVENT, HEALTH } from '../constants'
+import { makeJournalEntry } from '../data/journal'
 import './CravingSurf.css'
 
 const TOTAL = 90 // seconds
@@ -48,11 +49,23 @@ export default function CravingSurf({ state, update, onClose }) {
 
   function handleSurfed() {
     const now = Date.now()
-    update(prev => ({
-      ...prev,
-      events: [...prev.events, { id: now, type: EVENT.CRAVING_SURFED, ts: now }],
-      health: Math.min(prev.health + HEALTH.SURF_GAIN, HEALTH.MAX),
-    }))
+    update(prev => {
+      const triggered = new Set(prev.journalTriggered || [])
+      const newEntries = []
+      const surfKey = `${prev.stage}_event_craving_surf`
+      if (!triggered.has(surfKey)) {
+        triggered.add(surfKey)
+        const entry = makeJournalEntry(prev.stage, 'event_craving_surf')
+        if (entry) newEntries.push(entry)
+      }
+      return {
+        ...prev,
+        events: [...prev.events, { id: now, type: EVENT.CRAVING_SURFED, ts: now }],
+        health: Math.min(prev.health + HEALTH.SURF_GAIN, HEALTH.MAX),
+        journalEntries: [...(prev.journalEntries || []), ...newEntries],
+        journalTriggered: [...triggered],
+      }
+    })
     onClose()
   }
 

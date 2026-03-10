@@ -2,12 +2,12 @@ import { memo } from 'react'
 import './BottomNav.css'
 
 const TABS = [
-  { id: 'home',       label: 'Home',  icon: '🌱' },
-  { id: 'intentions', label: 'Why',   icon: '✦' },
-  { id: 'stats',      label: 'Stats', icon: '◈' },
+  { id: 'home',       label: 'Home',    icon: '🌱' },
+  { id: 'intentions', label: 'Why',     icon: '✦' },
+  { id: 'journal',    label: 'Journal', icon: '✎' },
+  { id: 'stats',      label: 'Stats',   icon: '◈' },
 ]
 
-// memo: skip re-render unless the active tab changes
 const BottomNav = memo(function BottomNav({ active, onChange }) {
   return (
     <nav className="bottom-nav">

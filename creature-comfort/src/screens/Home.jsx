@@ -2,22 +2,11 @@ import { useState, useEffect, useRef } from 'react'
 import CreatureCanvas from '../components/CreatureCanvas'
 import { getMsSinceLastUse, formatDuration, computeHealthAfterUse } from '../hooks/useStore'
 import { EVENT, HEALTH, TIMING, STAGE_NAMES, HONESTY_REWARD_CHANCE } from '../constants'
+import { IDLE_BUBBLES, makeJournalEntry } from '../data/journal'
 import './Home.css'
 
-// ── Creature speech — contextual, stage-aware ─────────────
-const SPEECH_BY_STAGE = [
-  [], // index 0 unused
-  // Stage 1: Seedling — quiet, tentative
-  ['still here.', 'roots growing.', '...', 'you came back.', 'small, but real.'],
-  // Stage 2: Sprout — curious, hopeful
-  ['i can see a little further now.', 'something\'s changing.', 'i felt that craving with you.', 'you\'re doing it.', 'we\'re both figuring this out.'],
-  // Stage 3: Wanderer — present, grounded
-  ['the forest feels different today.', 'that one was hard. i know.', 'still here. still growing.', 'i hopped. did you see?', 'you give me room to breathe.'],
-  // Stage 4: Blossoming — warm, reflective
-  ['i\'m almost glowing.', 'remember the beginning?', 'fur\'s coming in soft.', 'you gave me this.', 'i notice every day you choose us.'],
-  // Stage 5: Radiant — full, luminous
-  ['look at us.', 'i glow because you stayed.', 'the fireflies know your name.', 'we made it this far.', 'you\'re enough.'],
-]
+// IDLE_BUBBLES imported from journal.js — single source of truth
+const SPEECH_BY_STAGE = IDLE_BUBBLES
 
 // ── Honesty reward — shown instead of penalty, 1 in 4 ────
 const HONESTY_MESSAGES = [
@@ -118,16 +107,24 @@ export default function Home({ state, update, onCravingSurf }) {
     const newEvent = { id: now, type: EVENT.USED, ts: now }
 
     if (isHonestyReward) {
-      // Reward honesty — log the event but skip the health penalty.
-      // computeHealthAfterUse runs inside the callback to avoid stale state.
       update(prev => {
-        const { consecutiveSlips, lastSlipTs } = computeHealthAfterUse(prev)
+        const { health, stage, consecutiveSlips, lastSlipTs } = computeHealthAfterUse(prev)
+        const triggered = new Set(prev.journalTriggered || [])
+        const newEntries = []
+        const slipKey = `${prev.stage}_event_slip`
+        if (!triggered.has(slipKey)) {
+          triggered.add(slipKey)
+          const entry = makeJournalEntry(prev.stage, 'event_slip')
+          if (entry) newEntries.push(entry)
+        }
         return {
           ...prev,
           events: [...prev.events, newEvent],
           consecutiveSlips,
           lastSlipTs,
           startedAt: prev.startedAt || now,
+          journalEntries: [...(prev.journalEntries || []), ...newEntries],
+          journalTriggered: [...triggered],
         }
       })
       showCreatureMsg(pick(HONESTY_MESSAGES))
@@ -136,11 +133,27 @@ export default function Home({ state, update, onCravingSurf }) {
       setTimeout(() => setReacting(false), TIMING.REACT_ANIMATION)
       update(prev => {
         const healthDelta = computeHealthAfterUse(prev)
+        const triggered = new Set(prev.journalTriggered || [])
+        const newEntries = []
+        const slipKey = `${prev.stage}_event_slip`
+        if (!triggered.has(slipKey)) {
+          triggered.add(slipKey)
+          const entry = makeJournalEntry(prev.stage, 'event_slip')
+          if (entry) newEntries.push(entry)
+        }
+        const wiltKey = `${prev.stage}_wilt`
+        if (prev.health >= HEALTH.WILT_THRESHOLD && healthDelta.health < HEALTH.WILT_THRESHOLD && !triggered.has(wiltKey)) {
+          triggered.add(wiltKey)
+          const wiltEntry = makeJournalEntry(prev.stage, 'wilt')
+          if (wiltEntry) newEntries.push(wiltEntry)
+        }
         return {
           ...prev,
           events: [...prev.events, newEvent],
           ...healthDelta,
           startedAt: prev.startedAt || now,
+          journalEntries: [...(prev.journalEntries || []), ...newEntries],
+          journalTriggered: [...triggered],
         }
       })
     }
@@ -148,12 +161,24 @@ export default function Home({ state, update, onCravingSurf }) {
 
   function logResisted() {
     const now = Date.now()
-    update(prev => ({
-      ...prev,
-      events: [...prev.events, { id: now, type: EVENT.RESISTED, ts: now }],
-      health: Math.min(prev.health + HEALTH.RESISTED_GAIN, HEALTH.MAX),
-      startedAt: prev.startedAt || now,
-    }))
+    update(prev => {
+      const triggered = new Set(prev.journalTriggered || [])
+      const newEntries = []
+      const resistKey = `${prev.stage}_event_resist`
+      if (!triggered.has(resistKey)) {
+        triggered.add(resistKey)
+        const entry = makeJournalEntry(prev.stage, 'event_resist')
+        if (entry) newEntries.push(entry)
+      }
+      return {
+        ...prev,
+        events: [...prev.events, { id: now, type: EVENT.RESISTED, ts: now }],
+        health: Math.min(prev.health + HEALTH.RESISTED_GAIN, HEALTH.MAX),
+        startedAt: prev.startedAt || now,
+        journalEntries: [...(prev.journalEntries || []), ...newEntries],
+        journalTriggered: [...triggered],
+      }
+    })
   }
 
   // Walk back the most recent resisted log — no extra punishment.
