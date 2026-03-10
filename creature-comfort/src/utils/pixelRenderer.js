@@ -4,8 +4,8 @@
 import { HEALTH } from '../constants'
 
 export const SCALE = 4 // renders at 256x384 display
-export const W = 64
-export const H = 96
+export const W = 72
+export const H = 80
 
 // ── Palette ──────────────────────────────────────────────
 export const C = {
