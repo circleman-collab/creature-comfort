@@ -288,11 +288,11 @@ export function drawEnvironment(ctx, stage, health, tick, stageJustAdvanced = fa
 
   // ── Sky gradient (richer with stage) ─────────────────
   const skyColors = [
-    ['#0a1209', '#0d1a0f'],  // s1: deep night
-    ['#0d1a0f', '#111f13'],  // s2: late dusk
-    ['#0f1e11', '#162a18'],  // s3: early dawn
-    ['#121f14', '#1e3820'],  // s4: morning
-    ['#162318', '#264e28'],  // s5: deep forest day
+    ['#0f1225', '#1e2040'],
+    ['#111830', '#22304e'],
+    ['#152840', '#265068'],
+    ['#1c3850', '#346070'],
+    ['#224460', '#4a7888'],
   ]
   const [skyTop, skyBot] = skyColors[stage - 1]
   const skyGrad = ctx.createLinearGradient(0, 0, 0, 56 * SCALE)
@@ -302,27 +302,27 @@ export function drawEnvironment(ctx, stage, health, tick, stageJustAdvanced = fa
   ctx.fillRect(0, 0, W * SCALE, 56 * SCALE)
 
   // ── Ground fill (below horizon) ───────────────────────
-  ctx.fillStyle = C.b1
+  ctx.fillStyle = '#221408'
   ctx.fillRect(0, 56 * SCALE, W * SCALE, (H - 56) * SCALE)
 
   // ── Clouds ─────────────────────────────────────────────
   if (!wilt) {
-    const cloudAlpha = [0.12, 0.18, 0.22, 0.28, 0.32][stage - 1]
+    const cloudAlpha = [0.18, 0.24, 0.28, 0.34, 0.40][stage - 1]
     drawClouds(ctx, tick, cloudAlpha, stageJustAdvanced)
   }
 
   // ── Horizon line (sky meets earth) ────────────────────
   // Subtle lighter band at y=55 — the seam between worlds
-  const horizonCol = wilt ? '#2a1a0a' : '#1e3a1e'
+  const horizonCol = wilt ? '#2a1a0a' : '#5a3418'
   fill(ctx, Array.from({length: W}, (_, x) => [x, 55]), horizonCol)
 
   // ── Ground surface ────────────────────────────────────
   const groundY = 56
-  fill(ctx, Array.from({length: W}, (_, x) => [x, groundY]),   wilt ? C.b2 : C.g2)
-  fill(ctx, Array.from({length: W}, (_, x) => [x, groundY+1]), wilt ? C.b1 : C.g1)
-  fill(ctx, Array.from({length: W}, (_, x) => [x, groundY+2]), C.b1)
+  fill(ctx, Array.from({length: W}, (_, x) => [x, groundY]),   wilt ? C.b2 : '#4e2c14')
+  fill(ctx, Array.from({length: W}, (_, x) => [x, groundY+1]), wilt ? C.b1 : '#341a0a')
+  fill(ctx, Array.from({length: W}, (_, x) => [x, groundY+2]), '#221408')
   for (let dy = 3; dy <= H - groundY - 1; dy++) {
-    fill(ctx, Array.from({length: W}, (_, x) => [x, groundY + dy]), C.b1)
+    fill(ctx, Array.from({length: W}, (_, x) => [x, groundY + dy]), '#221408')
   }
 
   // ── Grass tufts (stage 2+) ────────────────────────────
@@ -405,7 +405,7 @@ function drawClouds(ctx, tick, alpha, stageJustAdvanced) {
 
   clouds.forEach(({ shape, speed, offset, y }) => {
     const xBase = ((tick * speed + offset) % (W + 10)) - 6
-    ctx.fillStyle = '#c8dfc0'
+    ctx.fillStyle = '#c8d4e0'
     shape.forEach(([dx, dy]) => {
       const px = Math.floor(xBase + dx)
       const py = y + dy
@@ -431,7 +431,7 @@ function drawBird(ctx, tick, offset = false) {
 
   if (x < 0 || x > W - 2) return
 
-  ctx.fillStyle = '#0a150b'
+  ctx.fillStyle = '#0a0e18'
   // V shape: two diagonal wings
   ctx.fillRect((x)   * SCALE, (y)   * SCALE, SCALE, SCALE)
   ctx.fillRect((x+1) * SCALE, (y+1) * SCALE, SCALE, SCALE)

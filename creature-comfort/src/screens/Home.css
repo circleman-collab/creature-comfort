@@ -2,7 +2,6 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  padding-bottom: calc(60px + var(--safe-bottom));
   overflow: hidden;
 }
 
@@ -10,8 +9,10 @@
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  padding: 16px 20px 8px;
+  padding: 12px 20px 6px;
   flex-shrink: 0;
+  /* Header sits on the device shell — subtle separator */
+  border-bottom: 1px solid var(--shell-shadow);
 }
 
 .home-creature-name {
@@ -41,63 +42,11 @@
   display: block;
 }
 
-/* ── Porthole frame ───────────────────────────────────────
-   Dark weathered wood surround. The frame is purely CSS —
-   layered gradients to suggest grain and depth, no image.
-   Shape is oval-ish portrait, slightly squashed.
-─────────────────────────────────────────────────────────── */
-.porthole-frame {
-  border-radius: 46% / 36%;
-  padding: 8px 14px;
-  position: relative;
-
-  /* Wood base */
-  background:
-    /* grain streaks — subtle diagonal lines */
-    repeating-linear-gradient(
-      92deg,
-      transparent,
-      transparent 3px,
-      rgba(0,0,0,0.07) 3px,
-      rgba(0,0,0,0.07) 4px
-    ),
-    repeating-linear-gradient(
-      88deg,
-      transparent,
-      transparent 7px,
-      rgba(255,200,100,0.03) 7px,
-      rgba(255,200,100,0.03) 8px
-    ),
-    /* warm wood base — dark, weathered */
-    radial-gradient(
-      ellipse at 40% 30%,
-      #3d2210 0%,
-      #2e1a0e 40%,
-      #1a0f08 100%
-    );
-
-  /* Outer shadow: lifts the frame off the page */
-  box-shadow:
-    0 6px 24px rgba(0,0,0,0.7),
-    0 2px 8px rgba(0,0,0,0.5),
-    inset 0 1px 0 rgba(255,200,120,0.06);
-
-  /* Inner wood lip — slightly lighter ring just inside edge */
-  outline: 3px solid #2e1a0e;
-  outline-offset: -3px;
-}
-
 /* Inner glass ring */
 .porthole-glass {
-  border-radius: 42% / 32%;
   overflow: hidden;
   position: relative;
-  max-height: 224px; /* clip to above-ground rows (56 logical × 4 scale) — fits mobile viewports */
-
-  /* Glass depth — dark inset shadow */
-  box-shadow:
-    inset 0 3px 12px rgba(0,0,0,0.75),
-    inset 0 -1px 4px rgba(0,0,0,0.4);
+  box-shadow: inset 0 2px 8px rgba(0,0,0,0.6);
 }
 
 /* Light catching the glass — faint highlight arc at top */
@@ -187,28 +136,38 @@
 
 /* Actions */
 .home-actions {
-  padding: 0 20px 12px;
+  padding: 0 16px 14px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
   flex-shrink: 0;
 }
 
+/* Primary craving button — the big action, center stage */
 .btn-craving {
   width: 100%;
-  padding: 16px 20px;
-  background: var(--surface);
-  border: 2px solid var(--accent-dim);
+  padding: 15px 20px;
+  background: var(--shell-hi);
+  border: 1px solid var(--shell-shadow);
+  border-top: 1px solid var(--shell-hi);
+  border-bottom: 5px solid var(--shell-shadow);
+  box-shadow: 0 4px 0 var(--shell-shadow);
   color: var(--text);
   cursor: pointer;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 3px;
-  transition: background 0.15s;
+  transition: transform 0.08s, box-shadow 0.08s, border-bottom-width 0.08s;
+  border-radius: 4px;
 }
 
-.btn-craving:active { background: var(--accent-dim); }
+.btn-craving:active {
+  transform: translateY(3px);
+  border-bottom-width: 2px;
+  box-shadow: 0 1px 0 var(--shell-shadow);
+  background: var(--shell);
+}
 
 .btn-craving-main {
   font-family: var(--pixel);
@@ -224,23 +183,36 @@
 
 .home-actions-row {
   display: flex;
-  gap: 10px;
+  gap: 8px;
 }
 
+/* Secondary buttons — hardware feel, part of the device */
 .btn-used, .btn-resisted {
   flex: 1;
-  padding: 14px 10px;
-  background: var(--surface);
-  border: 2px solid var(--border-hi);
+  padding: 13px 10px;
+  background: var(--shell-hi);
+  border: 1px solid var(--shell-shadow);
+  border-top: 1px solid var(--shell-hi);
+  border-bottom: 5px solid var(--shell-shadow);
+  box-shadow: 0 4px 0 var(--shell-shadow);
   font-family: var(--pixel);
   font-size: 10px;
   letter-spacing: 0.06em;
   cursor: pointer;
-  transition: background 0.1s, border-color 0.1s;
+  border-radius: 4px;
+  transition: transform 0.08s, box-shadow 0.08s, border-bottom-width 0.08s;
 }
 
-.btn-used { color: var(--red); border-color: var(--red-dim); }
-.btn-used:active { background: var(--red-dim); }
+.btn-used {
+  color: var(--red);
+  border-left: 1px solid var(--red-dim);
+}
+.btn-used:active {
+  transform: translateY(3px);
+  border-bottom-width: 2px;
+  box-shadow: 0 1px 0 var(--shell-shadow);
+  background: var(--shell);
+}
 
 .btn-resisted {
   color: var(--text-dim);
@@ -249,7 +221,12 @@
   align-items: center;
   gap: 3px;
 }
-.btn-resisted:active { background: var(--border); }
+.btn-resisted:active {
+  transform: translateY(3px);
+  border-bottom-width: 2px;
+  box-shadow: 0 1px 0 var(--shell-shadow);
+  background: var(--shell);
+}
 
 .btn-friction {
   font-family: var(--prose);
@@ -279,17 +256,17 @@
 /* Creature speech bubble — floats above the porthole */
 .creature-bubble {
   position: absolute;
-  top: -52px;
+  top: 8px;
   left: 50%;
   transform: translateX(-50%);
-  background: var(--surface);
-  border: 2px solid var(--border-hi);
-  padding: 7px 14px;
+  background: rgba(10, 12, 11, 0.85);
+  border: 1px solid var(--border-hi);
+  padding: 10px 18px;
   max-width: 210px;
   text-align: center;
   font-family: var(--prose);
   font-style: italic;
-  font-size: 13px;
+  font-size: 14px;
   color: var(--text-dim);
   white-space: normal;
   opacity: 0;
@@ -317,7 +294,7 @@
   bottom: calc(60px + var(--safe-bottom));
   left: 0;
   right: 0;
-  background: var(--bg2);
+  background: var(--shell-lo);
   border-top: 2px solid var(--gold-dim);
   padding: 10px 16px 12px;
   z-index: 200;

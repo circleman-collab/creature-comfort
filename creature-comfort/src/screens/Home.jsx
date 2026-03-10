@@ -232,29 +232,32 @@ export default function Home({ state, update, onCravingSurf }) {
         <div className="home-stage-label">{STAGE_NAMES[state.stage]}</div>
       </div>
 
-      {/* Porthole + canvas */}
-      <div className="home-canvas-wrap">
-        <div className={`creature-bubble ${bubbleMsg ? 'visible' : ''}`}>
-          {bubbleMsg}
-        </div>
-        <div className="porthole-frame">
+      {/* Screen area — bezel + porthole */}
+      <div className="device-screen-area">
+        <div className="home-canvas-wrap">
+          <div className={`creature-bubble ${bubbleMsg ? 'visible' : ''}`}>
+            {bubbleMsg}
+          </div>
           <div className="porthole-glass">
             <CreatureCanvas stage={state.stage} health={state.health} stageJustAdvanced={stageJustAdvanced} />
           </div>
-        </div>
-        <div className="health-bar-wrap">
-          <div className="health-bar">
-            <div
-              className="health-bar-fill"
-              style={{
-                width: `${state.health}%`,
-                background: state.health > 60 ? 'var(--accent)' :
-                            state.health > 30 ? 'var(--gold)' : 'var(--red)'
-              }}
-            />
+          <div className="health-bar-wrap">
+            <div className="health-bar">
+              <div
+                className="health-bar-fill"
+                style={{
+                  width: `${state.health}%`,
+                  background: state.health > 60 ? 'var(--accent)' :
+                              state.health > 30 ? 'var(--gold)' : 'var(--red)'
+                }}
+              />
+            </div>
           </div>
         </div>
       </div>
+
+      {/* Controls area — device body below the screen */}
+      <div className="device-controls-area">
 
       {/* Intention whisper / creature message — shared slot */}
       <div className={`intention-whisper ${(showIntention && !creatureMsg) ? 'visible' : ''}`}>
@@ -291,7 +294,7 @@ export default function Home({ state, update, onCravingSurf }) {
         </div>
 
         <button className="btn-lied" onClick={undoLastResisted}>
-          ↩ I lied about resisting
+          I lied about resisting
         </button>
       </div>
 
@@ -343,6 +346,7 @@ export default function Home({ state, update, onCravingSurf }) {
           </div>
         </div>
       )}
+      </div>{/* end device-controls-area */}
     </div>
   )
 }
