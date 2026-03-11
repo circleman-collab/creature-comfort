@@ -24,6 +24,7 @@
   flex-direction: column;
 }
 
+
 /* Lift overflow during journal 3D flip so preserve-3d isn't clipped */
 .app-content.journal-flipping {
   overflow: visible;
@@ -42,7 +43,6 @@
   background: var(--bezel);
   position: relative;
   flex-shrink: 0;
-  max-height: 52vh;
   border: 2px solid var(--shell-lo);
   outline: 2px solid #0a0c0b;
   outline-offset: -2px;
