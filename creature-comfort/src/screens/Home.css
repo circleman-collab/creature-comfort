@@ -40,6 +40,8 @@
 
 .home-canvas-wrap canvas {
   display: block;
+  max-height: 100%;
+  width: auto;
 }
 
 /* Inner glass ring */
@@ -47,6 +49,7 @@
   overflow: hidden;
   position: relative;
   width: 100%;
+  max-height: inherit;
   box-shadow: inset 0 2px 8px rgba(0,0,0,0.6);
 }
 

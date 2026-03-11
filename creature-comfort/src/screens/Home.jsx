@@ -114,7 +114,9 @@ export default function Home({ state, update, onCravingSurf }) {
 
   function logUse() {
     const now = Date.now()
-    const isHonestyReward = Math.random() < HONESTY_REWARD_CHANCE
+    // Fix 5: first slip ever always gets the honesty reward
+    const isFirstSlip = !state.events.some(e => e.type === EVENT.USED)
+    const isHonestyReward = isFirstSlip || Math.random() < HONESTY_REWARD_CHANCE
     const newEvent = { id: now, type: EVENT.USED, ts: now }
 
     if (isHonestyReward) {
@@ -272,7 +274,7 @@ export default function Home({ state, update, onCravingSurf }) {
         <div className="timer-label">clean for</div>
         <div className="timer-value">{formatDuration(elapsed)}</div>
         <div className="timer-sub">
-          {daysSinceStart > 0 ? `day ${daysSinceStart + 1} of your journey` : 'your journey begins now'}
+          {daysSinceStart > 0 ? `day ${daysSinceStart + 1} · current streak` : 'your journey begins now'}
         </div>
       </div>
 

@@ -1,12 +1,27 @@
 :root {
-  --bg:          #0d1a0f;
+  /* ── Screen world (lives only inside the canvas/porthole) ── */
+  --screen-bg:   #0d1a0f;
+
+  /* ── Device shell ─────────────────────────────────────────── */
+  --shell:        #1a2420;  /* device body — dark desaturated green-black */
+  --shell-hi:     #243028;  /* subtle panel highlight / raised surfaces   */
+  --shell-lo:     #141c1a;  /* recessed panel / deep shadow               */
+  --shell-shadow: #0d1512;  /* deepest shadow — button press, seams       */
+  --bezel:        #0a0c0b;  /* screen surround — near-black               */
+
+  /* ── App surfaces (UI inside the device body) ─────────────── */
+  --bg:          #131e1b;   /* shifted — warmer, more desaturated than screen */
   --bg2:         #111f13;
-  --surface:     #162119;
+  --surface:     #1a2820;
   --border:      #1e3022;
   --border-hi:   #2a4530;
+
+  /* ── Text ─────────────────────────────────────────────────── */
   --text:        #d4e8c2;
   --text-dim:    #6a8f5a;
   --text-muted:  #2e4a30;
+
+  /* ── Accents ──────────────────────────────────────────────── */
   --accent:      #7ec850;
   --accent-dim:  #3a6e22;
   --gold:        #c8a84b;
@@ -14,8 +29,12 @@
   --red:         #c0452b;
   --red-dim:     #6b2218;
   --ember:       #e87c3e;
+
+  /* ── Typography ───────────────────────────────────────────── */
   --pixel:       'Silkscreen', monospace;
   --prose:       'Crimson Pro', serif;
+
+  /* ── Safe areas ───────────────────────────────────────────── */
   --safe-top:    env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
 }
@@ -24,7 +43,7 @@
 
 html, body, #root {
   height: 100%;
-  background: var(--bg);
+  background: var(--shell);
   color: var(--text);
   font-family: var(--pixel);
   -webkit-font-smoothing: none;
