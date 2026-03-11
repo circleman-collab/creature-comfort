@@ -111,8 +111,8 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding: 0 20px;
+  justify-content: flex-start;
+  padding: 12px 20px 0;
 }
 
 .timer-label {
@@ -140,7 +140,7 @@
 
 /* Actions */
 .home-actions {
-  padding: 0 16px 14px;
+  padding: 0 16px 8px;
   display: flex;
   flex-direction: column;
   gap: 8px;
