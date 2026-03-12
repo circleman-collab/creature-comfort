@@ -21,11 +21,20 @@
 }
 
 .bnav-icon {
-  font-size: 18px;
-  line-height: 1;
-  filter: grayscale(1);
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
   opacity: 0.3;
-  transition: filter 0.2s, opacity 0.2s;
+  transition: color 0.2s, opacity 0.2s;
+}
+
+.bnav-icon svg {
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
 }
 
 .bnav-label {
@@ -38,7 +47,7 @@
 }
 
 .bnav-btn.active .bnav-icon {
-  filter: none;
+  color: var(--accent);
   opacity: 1;
 }
 
