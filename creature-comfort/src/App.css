@@ -9,6 +9,7 @@
   flex-direction: column;
   background: var(--shell);
   padding-top: var(--safe-top);
+  padding-bottom: env(safe-area-inset-bottom);
 
   /* Device body texture — subtle noise grain over the shell */
   background-image:
@@ -89,4 +90,5 @@
   background: var(--shell-lo);
   border-top: 1px solid var(--shell-shadow);
   flex-shrink: 0;
+  padding-bottom: env(safe-area-inset-bottom);
 }

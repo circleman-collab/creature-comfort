@@ -39,7 +39,7 @@
   --safe-bottom: env(safe-area-inset-bottom, 0px);
 }
 
-* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
 
 html, body, #root {
   height: 100%;
@@ -49,6 +49,11 @@ html, body, #root {
   -webkit-font-smoothing: none;
   image-rendering: pixelated;
   overflow: hidden;
+}
+
+body {
+  overscroll-behavior: none;
+  -webkit-font-smoothing: antialiased;
 }
 
 /* Pixel rendering everywhere */
