@@ -39,6 +39,28 @@ export default function Home({ state, update, onCravingSurf }) {
   const creatureMsgTimerRef = useRef(null)
   const tapCountRef = useRef(0)
   const tapTimerRef = useRef(null)
+  const heightOverlayRef = useRef(null)
+
+  useEffect(() => {
+    function measure() {
+      const get = sel => (document.querySelector(sel)?.clientHeight ?? '?')
+      const lines = [
+        `window.innerHeight: ${window.innerHeight}`,
+        `.home-header: ${get('.home-header')}`,
+        `.device-screen-area: ${get('.device-screen-area')}`,
+        `.device-controls-area: ${get('.device-controls-area')}`,
+        `.home-timer: ${get('.home-timer')}`,
+        `.home-actions: ${get('.home-actions')}`,
+        `.device-nav-area: ${get('.device-nav-area')}`,
+      ]
+      if (heightOverlayRef.current) {
+        heightOverlayRef.current.textContent = lines.join('  |  ')
+      }
+    }
+    measure()
+    window.addEventListener('resize', measure)
+    return () => window.removeEventListener('resize', measure)
+  }, [])
 
   // Detect stage advance for bonus bird in environment
   useEffect(() => {
@@ -349,6 +371,23 @@ export default function Home({ state, update, onCravingSurf }) {
         </div>
       )}
       </div>{/* end device-controls-area */}
+
+      <div
+        ref={heightOverlayRef}
+        style={{
+          position: 'fixed',
+          bottom: 70,
+          left: 0,
+          right: 0,
+          background: 'black',
+          color: 'lime',
+          fontSize: 10,
+          zIndex: 9999,
+          padding: 4,
+          whiteSpace: 'nowrap',
+          overflow: 'hidden',
+        }}
+      />
     </div>
   )
 }
