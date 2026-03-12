@@ -78,36 +78,36 @@ export function drawStage2(ctx, health, tick) {
   const col2 = wilt ? C.w2 : C.g4
 
   // Root feet
-  fill(ctx, [[28,54],[29,54],[30,54]], C.b3)
-  fill(ctx, [[33,54],[34,54],[35,54]], C.b3)
-  fill(ctx, [[27,53],[28,53],[29,53]], C.b4)
-  fill(ctx, [[34,53],[35,53],[36,53]], C.b4)
+  fill(ctx, [[32,54],[33,54],[34,54]], C.b3)
+  fill(ctx, [[37,54],[38,54],[39,54]], C.b3)
+  fill(ctx, [[31,53],[32,53],[33,53]], C.b4)
+  fill(ctx, [[38,53],[39,53],[40,53]], C.b4)
 
   // Body
   fill(ctx, [
-    [29,51],[30,51],[31,51],[32,51],[33,51],[34,51],
-    [28,50],[29,50],[30,50],[31,50],[32,50],[33,50],[34,50],[35,50],
-    [28,49+bob],[29,49+bob],[30,49+bob],[31,49+bob],[32,49+bob],[33,49+bob],[34,49+bob],[35,49+bob],
-    [29,48+bob],[30,48+bob],[31,48+bob],[32,48+bob],[33,48+bob],[34,48+bob],
+    [33,51],[34,51],[35,51],[36,51],[37,51],[38,51],
+    [32,50],[33,50],[34,50],[35,50],[36,50],[37,50],[38,50],[39,50],
+    [32,49+bob],[33,49+bob],[34,49+bob],[35,49+bob],[36,49+bob],[37,49+bob],[38,49+bob],[39,49+bob],
+    [33,48+bob],[34,48+bob],[35,48+bob],[36,48+bob],[37,48+bob],[38,48+bob],
   ], col)
 
   // Leaf crown
   fill(ctx, [
-    [28,47+bob],[29,47+bob],[30,47+bob],[31,47+bob],[32,47+bob],[33,47+bob],[34,47+bob],[35,47+bob],
-    [29,46+bob],[30,46+bob],[31,46+bob],[32,46+bob],[33,46+bob],[34,46+bob],
-    [30,45+bob],[31,45+bob],[32,45+bob],[33,45+bob],
+    [32,47+bob],[33,47+bob],[34,47+bob],[35,47+bob],[36,47+bob],[37,47+bob],[38,47+bob],[39,47+bob],
+    [33,46+bob],[34,46+bob],[35,46+bob],[36,46+bob],[37,46+bob],[38,46+bob],
+    [34,45+bob],[35,45+bob],[36,45+bob],[37,45+bob],
   ], col2)
 
   // Eyes
   const eyeY = 49 + bob
-  dot(ctx, 30, eyeY, C.e1)
-  dot(ctx, 33, eyeY, C.e1)
-  dot(ctx, 30, eyeY-1, C.e2)  // gleam
-  dot(ctx, 33, eyeY-1, C.e2)
+  dot(ctx, 34, eyeY, C.e1)
+  dot(ctx, 37, eyeY, C.e1)
+  dot(ctx, 34, eyeY-1, C.e2)  // gleam
+  dot(ctx, 37, eyeY-1, C.e2)
 
   // Wilt droop
   if (wilt) {
-    fill(ctx, [[30,eyeY+1],[31,eyeY+1],[32,eyeY+1]], C.w2) // frown
+    fill(ctx, [[34,eyeY+1],[35,eyeY+1],[36,eyeY+1]], C.w2) // frown
   }
 }
 
@@ -123,43 +123,43 @@ export function drawStage3(ctx, health, tick) {
   const y = 50 + (wilt ? 0 : yOff)
 
   // Legs
-  fill(ctx, [[29,y+4],[30,y+4],[29,y+5],[30,y+5]], C.b4)
   fill(ctx, [[33,y+4],[34,y+4],[33,y+5],[34,y+5]], C.b4)
+  fill(ctx, [[37,y+4],[38,y+4],[37,y+5],[38,y+5]], C.b4)
 
   // Body
   fill(ctx, [
-    [27,y+1],[28,y+1],[29,y+1],[30,y+1],[31,y+1],[32,y+1],[33,y+1],[34,y+1],[35,y+1],[36,y+1],
-    [27,y],[28,y],[29,y],[30,y],[31,y],[32,y],[33,y],[34,y],[35,y],[36,y],
-    [28,y-1],[29,y-1],[30,y-1],[31,y-1],[32,y-1],[33,y-1],[34,y-1],[35,y-1],
-    [29,y-2],[30,y-2],[31,y-2],[32,y-2],[33,y-2],[34,y-2],
+    [31,y+1],[32,y+1],[33,y+1],[34,y+1],[35,y+1],[36,y+1],[37,y+1],[38,y+1],[39,y+1],[40,y+1],
+    [31,y],[32,y],[33,y],[34,y],[35,y],[36,y],[37,y],[38,y],[39,y],[40,y],
+    [32,y-1],[33,y-1],[34,y-1],[35,y-1],[36,y-1],[37,y-1],[38,y-1],[39,y-1],
+    [33,y-2],[34,y-2],[35,y-2],[36,y-2],[37,y-2],[38,y-2],
   ], col)
 
   // Leaf ears/crown
   fill(ctx, [
-    [27,y-2],[28,y-2],[28,y-3],[29,y-3],[29,y-4],[30,y-4],  // left ear
-    [33,y-4],[34,y-4],[34,y-3],[35,y-3],[35,y-2],[36,y-2],  // right ear
-    [30,y-3],[31,y-3],[32,y-3],[33,y-3],                    // crown
-    [30,y-4],[31,y-4],[32,y-4],[33,y-4],
+    [31,y-2],[32,y-2],[32,y-3],[33,y-3],[33,y-4],[34,y-4],  // left ear
+    [37,y-4],[38,y-4],[38,y-3],[39,y-3],[39,y-2],[40,y-2],  // right ear
+    [34,y-3],[35,y-3],[36,y-3],[37,y-3],                    // crown
+    [34,y-4],[35,y-4],[36,y-4],[37,y-4],
   ], col2)
 
   // Highlights
-  fill(ctx, [[30,y-1],[31,y-1],[32,y-1],[33,y-1]], col3)
+  fill(ctx, [[34,y-1],[35,y-1],[36,y-1],[37,y-1]], col3)
 
   // Eyes
-  dot(ctx, 30, y, C.e1)
-  dot(ctx, 33, y, C.e1)
-  dot(ctx, 30, y-1, C.e2)
-  dot(ctx, 33, y-1, C.e2)
+  dot(ctx, 34, y, C.e1)
+  dot(ctx, 37, y, C.e1)
+  dot(ctx, 34, y-1, C.e2)
+  dot(ctx, 37, y-1, C.e2)
 
   // Arms/leaf tendrils
-  fill(ctx, [[25,y],[26,y],[25,y+1]], col2)
-  fill(ctx, [[37,y],[38,y],[38,y+1]], col2)
+  fill(ctx, [[29,y],[30,y],[29,y+1]], col2)
+  fill(ctx, [[41,y],[42,y],[42,y+1]], col2)
 
   if (wilt) {
-    fill(ctx, [[30,y+1],[31,y+1],[32,y+1]], C.w2)
+    fill(ctx, [[34,y+1],[35,y+1],[36,y+1]], C.w2)
   } else {
     // tiny smile
-    fill(ctx, [[30,y+1],[33,y+1]], col3)
+    fill(ctx, [[34,y+1],[37,y+1]], col3)
   }
 }
 
@@ -175,45 +175,45 @@ export function drawStage4(ctx, health, tick) {
   const y = 46 + breathe
 
   // Tail
-  fill(ctx, [[37,y+6],[38,y+6],[39,y+5],[39,y+4],[38,y+3]], fur)
+  fill(ctx, [[40,y+6],[41,y+6],[42,y+5],[42,y+4],[41,y+3]], fur)
 
   // Legs
-  fill(ctx, [[27,y+8],[28,y+8],[27,y+9],[28,y+9]], fur)
-  fill(ctx, [[34,y+8],[35,y+8],[34,y+9],[35,y+9]], fur)
+  fill(ctx, [[30,y+8],[31,y+8],[30,y+9],[31,y+9]], fur)
+  fill(ctx, [[37,y+8],[38,y+8],[37,y+9],[38,y+9]], fur)
 
   // Body (fur base)
   const body = []
-  for (let bx = 26; bx <= 36; bx++) for (let by = y+2; by <= y+7; by++) body.push([bx,by])
+  for (let bx = 29; bx <= 39; bx++) for (let by = y+2; by <= y+7; by++) body.push([bx,by])
   fill(ctx, body, fur)
 
   // Leaf overlay on back
   fill(ctx, [
-    [27,y+2],[28,y+2],[29,y+2],[30,y+2],[31,y+2],[32,y+2],[33,y+2],[34,y+2],[35,y+2],
-    [28,y+1],[29,y+1],[30,y+1],[31,y+1],[32,y+1],[33,y+1],[34,y+1],
-    [29,y],[30,y],[31,y],[32,y],[33,y],
+    [30,y+2],[31,y+2],[32,y+2],[33,y+2],[34,y+2],[35,y+2],[36,y+2],[37,y+2],[38,y+2],
+    [31,y+1],[32,y+1],[33,y+1],[34,y+1],[35,y+1],[36,y+1],[37,y+1],
+    [32,y],[33,y],[34,y],[35,y],[36,y],
   ], col)
 
   // Head
   fill(ctx, [
-    [27,y+2],[28,y+2],[29,y+2],[30,y+2],[31,y+2],[32,y+2],[33,y+2],[34,y+2],
-    [27,y+3],[28,y+3],[29,y+3],[30,y+3],[31,y+3],[32,y+3],[33,y+3],[34,y+3],
-    [28,y+4],[29,y+4],[30,y+4],[31,y+4],[32,y+4],[33,y+4],
+    [30,y+2],[31,y+2],[32,y+2],[33,y+2],[34,y+2],[35,y+2],[36,y+2],[37,y+2],
+    [30,y+3],[31,y+3],[32,y+3],[33,y+3],[34,y+3],[35,y+3],[36,y+3],[37,y+3],
+    [31,y+4],[32,y+4],[33,y+4],[34,y+4],[35,y+4],[36,y+4],
   ], fur)
 
   // Leaf ears
-  fill(ctx, [[26,y+1],[27,y+1],[26,y],[27,y]], leaf)
-  fill(ctx, [[35,y+1],[36,y+1],[35,y],[36,y]], leaf)
+  fill(ctx, [[29,y+1],[30,y+1],[29,y],[30,y]], leaf)
+  fill(ctx, [[38,y+1],[39,y+1],[38,y],[39,y]], leaf)
 
   // Glowing eye
-  dot(ctx, 29, y+3, C.e1)
   dot(ctx, 32, y+3, C.e1)
-  dot(ctx, 29, y+2, glow)
+  dot(ctx, 35, y+3, C.e1)
   dot(ctx, 32, y+2, glow)
+  dot(ctx, 35, y+2, glow)
 
   if (!wilt) {
     // nose glint
-    dot(ctx, 30, y+4, C.a2)
-    dot(ctx, 31, y+4, C.a2)
+    dot(ctx, 33, y+4, C.a2)
+    dot(ctx, 34, y+4, C.a2)
   }
 }
 
@@ -229,7 +229,7 @@ export function drawStage5(ctx, health, tick) {
   // Aura
   const auraAlpha = 0.18 + 0.08 * Math.sin(tick / 30)
   ctx.save()
-  const grad = ctx.createRadialGradient(32*SCALE, (y+4)*SCALE, 2*SCALE, 32*SCALE, (y+4)*SCALE, 14*SCALE)
+  const grad = ctx.createRadialGradient(36*SCALE, (y+4)*SCALE, 2*SCALE, 36*SCALE, (y+4)*SCALE, 14*SCALE)
   grad.addColorStop(0, `rgba(200, 255, 100, ${auraAlpha})`)
   grad.addColorStop(1, 'rgba(200,255,100,0)')
   ctx.fillStyle = grad
@@ -238,47 +238,47 @@ export function drawStage5(ctx, health, tick) {
 
   // Tail (bushy)
   fill(ctx, [
-    [37,y+8],[38,y+8],[39,y+7],[40,y+6],[40,y+5],[39,y+4],[38,y+4],
-    [38,y+7],[39,y+6],[39,y+5],
+    [41,y+8],[42,y+8],[43,y+7],[44,y+6],[44,y+5],[43,y+4],[42,y+4],
+    [42,y+7],[43,y+6],[43,y+5],
   ], leaf)
 
   // Legs
-  fill(ctx, [[26,y+10],[27,y+10],[26,y+11],[27,y+11]], fur)
-  fill(ctx, [[34,y+10],[35,y+10],[34,y+11],[35,y+11]], fur)
+  fill(ctx, [[30,y+10],[31,y+10],[30,y+11],[31,y+11]], fur)
+  fill(ctx, [[38,y+10],[39,y+10],[38,y+11],[39,y+11]], fur)
 
   // Body
   const body = []
-  for (let bx = 25; bx <= 37; bx++) for (let by = y+4; by <= y+9; by++) body.push([bx,by])
+  for (let bx = 29; bx <= 41; bx++) for (let by = y+4; by <= y+9; by++) body.push([bx,by])
   fill(ctx, body, fur)
 
   // Back leaves / mane
   fill(ctx, [
-    [25,y+3],[26,y+3],[27,y+3],[28,y+3],[29,y+3],[30,y+3],[31,y+3],[32,y+3],[33,y+3],[34,y+3],[35,y+3],
-    [26,y+2],[27,y+2],[28,y+2],[29,y+2],[30,y+2],[31,y+2],[32,y+2],[33,y+2],[34,y+2],
-    [27,y+1],[28,y+1],[29,y+1],[30,y+1],[31,y+1],[32,y+1],[33,y+1],
-    [29,y],[30,y],[31,y],[32,y],[33,y],
+    [29,y+3],[30,y+3],[31,y+3],[32,y+3],[33,y+3],[34,y+3],[35,y+3],[36,y+3],[37,y+3],[38,y+3],[39,y+3],
+    [30,y+2],[31,y+2],[32,y+2],[33,y+2],[34,y+2],[35,y+2],[36,y+2],[37,y+2],[38,y+2],
+    [31,y+1],[32,y+1],[33,y+1],[34,y+1],[35,y+1],[36,y+1],[37,y+1],
+    [33,y],[34,y],[35,y],[36,y],[37,y],
   ], leaf)
 
   // Head
   fill(ctx, [
-    [26,y+3],[27,y+3],[28,y+3],[29,y+3],[30,y+3],[31,y+3],[32,y+3],[33,y+3],[34,y+3],[35,y+3],
-    [26,y+4],[27,y+4],[28,y+4],[29,y+4],[30,y+4],[31,y+4],[32,y+4],[33,y+4],[34,y+4],[35,y+4],
-    [27,y+5],[28,y+5],[29,y+5],[30,y+5],[31,y+5],[32,y+5],[33,y+5],[34,y+5],
+    [30,y+3],[31,y+3],[32,y+3],[33,y+3],[34,y+3],[35,y+3],[36,y+3],[37,y+3],[38,y+3],[39,y+3],
+    [30,y+4],[31,y+4],[32,y+4],[33,y+4],[34,y+4],[35,y+4],[36,y+4],[37,y+4],[38,y+4],[39,y+4],
+    [31,y+5],[32,y+5],[33,y+5],[34,y+5],[35,y+5],[36,y+5],[37,y+5],[38,y+5],
   ], fur)
 
   // Glowing eyes
-  dot(ctx, 29, y+4, C.e1)
-  dot(ctx, 32, y+4, C.e1)
-  dot(ctx, 29, y+3, glow)
-  dot(ctx, 32, y+3, glow)
-  dot(ctx, 29, y+2, gleam)
-  dot(ctx, 32, y+2, gleam)
+  dot(ctx, 33, y+4, C.e1)
+  dot(ctx, 36, y+4, C.e1)
+  dot(ctx, 33, y+3, glow)
+  dot(ctx, 36, y+3, glow)
+  dot(ctx, 33, y+2, gleam)
+  dot(ctx, 36, y+2, gleam)
 
   // Nose
-  fill(ctx, [[30,y+5],[31,y+5]], glow)
+  fill(ctx, [[34,y+5],[35,y+5]], glow)
 
   // Smile
-  fill(ctx, [[29,y+6],[30,y+6],[31,y+6],[32,y+6]], leaf)
+  fill(ctx, [[33,y+6],[34,y+6],[35,y+6],[36,y+6]], leaf)
 }
 
 // ── Environment layers ────────────────────────────────────
