@@ -3,7 +3,7 @@
 
 import { HEALTH } from '../constants'
 
-export const SCALE = 4 // renders at 256x384 display
+export const SCALE = 3 // renders at 256x384 display
 export const W = 72
 export const H = 80
 
