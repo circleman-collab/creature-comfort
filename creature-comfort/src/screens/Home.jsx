@@ -54,7 +54,7 @@ export default function Home({ state, update, onCravingSurf }) {
         `.device-nav-area: ${get('.device-nav-area')}`,
       ]
       if (heightOverlayRef.current) {
-        heightOverlayRef.current.textContent = lines.join('  |  ')
+        heightOverlayRef.current.textContent = lines.join('\n')
       }
     }
     measure()
@@ -384,7 +384,7 @@ export default function Home({ state, update, onCravingSurf }) {
           fontSize: 10,
           zIndex: 9999,
           padding: 4,
-          whiteSpace: 'nowrap',
+          whiteSpace: 'pre',
           overflow: 'hidden',
         }}
       />
