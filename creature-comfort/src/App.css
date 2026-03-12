@@ -40,7 +40,7 @@
   display: flex;
   justify-content: center;
   align-items: stretch;
-  padding: 0 8px;
+  padding: 0 4px;
   background: var(--bezel);
   position: relative;
   flex-shrink: 0;
