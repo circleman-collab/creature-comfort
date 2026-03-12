@@ -44,7 +44,7 @@
   background: var(--bezel);
   position: relative;
   flex-shrink: 0;
-  max-height: calc(100vh - 370px);
+  max-height: calc(100vh - 340px);
   border: 2px solid var(--shell-lo);
   outline: 2px solid #0a0c0b;
   outline-offset: -2px;

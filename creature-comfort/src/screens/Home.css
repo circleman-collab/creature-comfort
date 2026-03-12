@@ -52,7 +52,7 @@
   overflow: hidden;
   position: relative;
   width: 100%;
-  max-height: inherit;
+  max-height: calc(100vh - 340px);
   flex-shrink: 1;
   min-height: 0;
   display: flex;
