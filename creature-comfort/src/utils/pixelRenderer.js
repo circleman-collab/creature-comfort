@@ -168,17 +168,22 @@ export function drawStage1(ctx, health, tick, hour = new Date().getHours(), wilt
   // Stem (leans with leanX)
   fill(ctx, [[31+leanX,42],[31+leanX,43],[31+leanX,44],[31+leanX,45]], col)
 
-  // Leaves
-  if (!wilt) {
-    // Left leaf base + rustling tip
+  // Leaves — crossfade between healthy (y=40-41) and drooped (y=42) positions
+  if (wiltProgress < 0.65) {
+    const a = Math.max(0, 1 - wiltProgress / 0.65)
+    ctx.save(); ctx.globalAlpha = a
     fill(ctx, [[28+leanX,41],[29+leanX,41],[30+leanX,41]], col)
     fill(ctx, [[32+leanX,41],[33+leanX,41],[34+leanX,41]], col)
-    // Highlights rustle outward
     fill(ctx, [[29+leanX-rustle,40],[30+leanX-rustle,40]], col2)
     fill(ctx, [[32+leanX+rustle,40],[33+leanX+rustle,40]], col2)
-  } else {
+    ctx.restore()
+  }
+  if (wiltProgress > 0.35) {
+    const a = Math.min(1, (wiltProgress - 0.35) / 0.65)
+    ctx.save(); ctx.globalAlpha = a
     fill(ctx, [[28,42],[29,42],[30,42]], col)
     fill(ctx, [[32,42],[33,42],[34,42]], col)
+    ctx.restore()
   }
 
   // Tiny bud (leans with leanX)
@@ -242,9 +247,11 @@ export function drawStage2(ctx, health, tick, hour = new Date().getHours(), wilt
     dot(ctx, 37+gx, eyeY+gy, C.e2)
   }
 
-  // Wilt droop
-  if (wilt) {
-    fill(ctx, [[34,eyeY+1],[35,eyeY+1],[36,eyeY+1]], C.w2) // frown
+  // Frown fades in with wiltProgress
+  if (wiltProgress > 0) {
+    ctx.save(); ctx.globalAlpha = Math.min(1, wiltProgress * 1.5)
+    fill(ctx, [[34,eyeY+1],[35,eyeY+1],[36,eyeY+1]], C.w2)
+    ctx.restore()
   }
   if (sleeping && !wilt) drawZzz(ctx, 39, 37, tick)
 }
@@ -332,11 +339,18 @@ export function drawStage3(ctx, health, tick, hour = new Date().getHours(), star
   fill(ctx, [[29,y],[30,y],[29,y+1]], col2)
   fill(ctx, [[41,y],[42,y],[42,y+1]], col2)
 
-  if (wilt) {
-    fill(ctx, [[34,y+1],[35,y+1],[36,y+1]], C.w2)
-  } else {
-    // tiny smile
+  // Smile fades out, frown fades in — both use alpha so no pixel snaps at 0.5 threshold
+  const smileAlpha = Math.max(0, 1 - wiltProgress * 1.5)
+  const frownAlpha = Math.max(0, (wiltProgress - 0.3) / 0.7)
+  if (smileAlpha > 0) {
+    ctx.save(); ctx.globalAlpha = smileAlpha
     fill(ctx, [[34,y+1],[37,y+1]], col3)
+    ctx.restore()
+  }
+  if (frownAlpha > 0) {
+    ctx.save(); ctx.globalAlpha = frownAlpha
+    fill(ctx, [[34,y+1],[35,y+1],[36,y+1]], C.w2)
+    ctx.restore()
   }
   if (sleeping && !wilt) drawZzz(ctx, 41, 37, tick)
 }
