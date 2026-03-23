@@ -34,19 +34,23 @@ export default function Home({ state, update, onCravingSurf }) {
   const [bubbleMsg, setBubbleMsg] = useState(null)
   const [creatureMsg, setCreatureMsg] = useState(null)
   const [debugMode, setDebugMode] = useState(false)
-  const [stageJustAdvanced, setStageJustAdvanced] = useState(false)
-  const prevStageRef = useRef(state.stage)
+  const [transitionInfo, setTransitionInfo] = useState(null)
   const creatureMsgTimerRef = useRef(null)
   const tapCountRef = useRef(0)
   const tapTimerRef = useRef(null)
-  // Detect stage advance for bonus bird in environment
+
+  // Detect stage advance via lastSeenStage — fires on visual discovery, not data change
   useEffect(() => {
-    if (state.stage > prevStageRef.current) {
-      setStageJustAdvanced(true)
-      setTimeout(() => setStageJustAdvanced(false), 8000)
+    if (transitionInfo) return
+    if (state.stage > state.lastSeenStage) {
+      setTransitionInfo({ fromStage: state.lastSeenStage, toStage: state.stage })
+      update({ lastSeenStage: state.stage })
     }
-    prevStageRef.current = state.stage
-  }, [state.stage])
+  }, [state.stage, state.lastSeenStage])
+
+  function onTransitionComplete() {
+    setTransitionInfo(null)
+  }
 
   function handleNameTap() {
     tapCountRef.current++
@@ -240,25 +244,26 @@ export default function Home({ state, update, onCravingSurf }) {
             {bubbleMsg}
           </div>
           <div className="porthole-glass">
-            <CreatureCanvas stage={state.stage} health={state.health} stageJustAdvanced={stageJustAdvanced} />
-          </div>
-          <div className="health-bar-wrap">
-            <div className="health-bar">
-              <div
-                className="health-bar-fill"
-                style={{
-                  width: `${state.health}%`,
-                  background: state.health > 60 ? 'var(--accent)' :
-                              state.health > 30 ? 'var(--gold)' : 'var(--red)'
-                }}
-              />
-            </div>
+            <CreatureCanvas key="home" stage={state.stage} health={state.health} transitionInfo={transitionInfo} onTransitionComplete={onTransitionComplete} startedAt={state.startedAt} />
           </div>
         </div>
       </div>
 
       {/* Controls area — device body below the screen */}
       <div className="device-controls-area">
+
+      <div className="health-bar-wrap">
+        <div className="health-bar">
+          <div
+            className="health-bar-fill"
+            style={{
+              width: `${state.health}%`,
+              background: state.health > 60 ? 'var(--accent)' :
+                          state.health > 30 ? 'var(--gold)' : 'var(--red)'
+            }}
+          />
+        </div>
+      </div>
 
       {/* Intention whisper / creature message — shared slot */}
       <div className={`intention-whisper ${(showIntention && !creatureMsg) ? 'visible' : ''}`}>
@@ -310,7 +315,7 @@ export default function Home({ state, update, onCravingSurf }) {
           <div className="debug-row">
             <span className="debug-label">Stage</span>
             <div className="debug-controls">
-              <button onClick={() => update(p => ({ ...p, stage: Math.max(1, p.stage - 1) }))}>←</button>
+              <button onClick={() => update(p => { const s = Math.max(1, p.stage - 1); return { ...p, stage: s, lastSeenStage: s } })}>←</button>
               <span className="debug-val">{state.stage} / 5</span>
               <button onClick={() => update(p => ({ ...p, stage: Math.min(5, p.stage + 1) }))}>→</button>
             </div>
@@ -348,6 +353,7 @@ export default function Home({ state, update, onCravingSurf }) {
         </div>
       )}
       </div>{/* end device-controls-area */}
+
     </div>
   )
 }

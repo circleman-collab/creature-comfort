@@ -34,12 +34,22 @@ const DEFAULT_STATE = {
 
   // Meta
   startedAt: null,
+  lastSeenStage: 1,
 }
 
 function load() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
-    if (raw) return { ...DEFAULT_STATE, ...JSON.parse(raw) }
+    if (raw) {
+      const parsed = JSON.parse(raw)
+      const merged = { ...DEFAULT_STATE, ...parsed }
+      // Migration: if saved data had no lastSeenStage, the user predates the
+      // transition system — they've already seen their current stage.
+      if (!('lastSeenStage' in parsed)) {
+        merged.lastSeenStage = merged.stage
+      }
+      return merged
+    }
   } catch (e) {}
   return { ...DEFAULT_STATE }
 }

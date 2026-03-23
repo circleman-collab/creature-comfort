@@ -12,18 +12,6 @@
   overflow-y: auto;
 }
 
-.surf-close {
-  position: absolute;
-  top: calc(16px + var(--safe-top));
-  right: 20px;
-  font-size: 14px;
-  color: var(--text-muted);
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 8px;
-}
-
 .surf-header {
   text-align: center;
   margin-bottom: 16px;
@@ -43,12 +31,17 @@
   color: var(--text-dim);
 }
 
-.surf-canvas-wrap {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 16px;
-  transform: scale(0.75);
-  transform-origin: center top;
+.surf-creature-wrap {
+  width: 216px;
+  height: 186px;
+  flex-shrink: 0;
+  margin-bottom: 12px;
+  overflow: hidden;
+}
+
+.surf-closing {
+  opacity: 0;
+  transition: opacity 80ms ease-out;
 }
 
 .surf-ring-wrap {

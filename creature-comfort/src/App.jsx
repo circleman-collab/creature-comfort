@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useStore, computeHealthGain } from './hooks/useStore'
 import { HEALTH, TIMING } from './constants'
-import { makeJournalEntry } from './data/journal'
+import { makeJournalEntry, makeIdleJournalEntry } from './data/journal'
 import Onboarding from './screens/Onboarding'
 import Home from './screens/Home'
 import Intentions from './screens/Intentions'
@@ -13,11 +13,13 @@ import './App.css'
 
 // Milestone definitions: key, minimum days elapsed, stage the entry is written for
 const MILESTONES = [
-  { key: 'day_1',  days: 1,  stage: 1, trigger: 'day_1_first_moments' },
-  { key: 'week_1', days: 7,  stage: 2, trigger: 'milestone_week_1' },
-  { key: 'week_2', days: 14, stage: 3, trigger: 'milestone_week_2' },
-  { key: 'week_3', days: 21, stage: 4, trigger: 'milestone_3_weeks' },
-  { key: 'month_1',days: 30, stage: 5, trigger: 'milestone_30_days' },
+  { key: 'day_1',   days: 1,  stage: 1, trigger: 'day_1_first_moments' },
+  { key: 'day_3',   days: 3,  stage: 1, trigger: 'day_3' },
+  { key: 'day_5',   days: 5,  stage: 1, trigger: 'day_5' },
+  { key: 'week_1',  days: 7,  stage: 2, trigger: 'milestone_week_1' },
+  { key: 'week_2',  days: 14, stage: 3, trigger: 'milestone_week_2' },
+  { key: 'week_3',  days: 21, stage: 4, trigger: 'milestone_3_weeks' },
+  { key: 'month_1', days: 30, stage: 5, trigger: 'milestone_30_days' },
 ]
 
 export default function App() {
@@ -53,6 +55,21 @@ export default function App() {
               if (entry) newEntries.push(entry)
             }
           })
+        }
+
+        // Daily idle journaling
+        if (prev.startedAt && newEntries.length === 0) {
+          const lastCreatureEntry = [...(prev.journalEntries || [])].sort((a, b) => b.ts - a.ts)[0]
+          const hoursSinceLastEntry = lastCreatureEntry
+            ? (Date.now() - lastCreatureEntry.ts) / 3600000
+            : 999
+          if (hoursSinceLastEntry >= 18) {
+            const result = makeIdleJournalEntry(gains.stage, triggered)
+            if (result) {
+              triggered.add(result.key)
+              newEntries.push(result.entry)
+            }
+          }
         }
 
         const hasChanges =

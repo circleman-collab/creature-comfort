@@ -23,18 +23,26 @@ const USER_PROMPTS = [
 export default function Journal({ state, update }) {
   const [flipped, setFlipped] = useState(false)
   const [draft, setDraft] = useState('')
+  const [userPage, setUserPage] = useState(0)
+  const [creaturePage, setCreaturePage] = useState(0)
+
+  const USER_PER_PAGE = 3
+  const CREATURE_PER_PAGE = 3
 
   const creatureEntries = useMemo(
-    () => [...(state.journalEntries || [])].reverse(),
+    () => [...(state.journalEntries || [])].sort((a, b) => b.ts - a.ts),
     [state.journalEntries]
   )
 
   const userEntries = useMemo(
-    () => [...(state.userJournalEntries || [])].reverse(),
+    () => [...(state.userJournalEntries || [])].sort((a, b) => b.ts - a.ts),
     [state.userJournalEntries]
   )
 
   const userPrompt = USER_PROMPTS[state.stage] || 'something happened today.'
+
+  useEffect(() => { setUserPage(0) }, [userEntries.length])
+  useEffect(() => { setCreaturePage(0) }, [creatureEntries.length])
 
   // Temporarily lift overflow on .app-content during the flip to avoid 3D clipping
   useEffect(() => {
@@ -64,6 +72,12 @@ export default function Journal({ state, update }) {
       handleSave()
     }
   }
+
+  const userPageCount = Math.max(1, Math.ceil(userEntries.length / USER_PER_PAGE))
+  const userPageEntries = userEntries.slice(userPage * USER_PER_PAGE, userPage * USER_PER_PAGE + USER_PER_PAGE)
+
+  const creaturePageCount = Math.max(1, Math.ceil(creatureEntries.length / CREATURE_PER_PAGE))
+  const creaturePageEntries = creatureEntries.slice(creaturePage * CREATURE_PER_PAGE, creaturePage * CREATURE_PER_PAGE + CREATURE_PER_PAGE)
 
   return (
     <div className="journal">
@@ -105,7 +119,7 @@ export default function Journal({ state, update }) {
               </div>
             )}
 
-            {userEntries.map((entry, i) => (
+            {userPageEntries.map((entry, i) => (
               <div key={entry.id} className="journal-entry">
                 <div className="je-meta">
                   <span className="je-date">
@@ -113,12 +127,26 @@ export default function Journal({ state, update }) {
                   </span>
                 </div>
                 <div className="je-text je-text-user prose">{entry.text}</div>
-                {i < userEntries.length - 1 && <div className="je-divider" />}
+                {i < userPageEntries.length - 1 && <div className="je-divider" />}
               </div>
             ))}
-
-            <div style={{ height: 32 }} />
           </div>
+
+          {userEntries.length > 0 && (
+            <div className="journal-pagination">
+              <button
+                className="journal-page-btn"
+                onClick={() => setUserPage(p => Math.max(0, p - 1))}
+                disabled={userPage === 0}
+              >←</button>
+              <span className="journal-page-count">{userPage + 1} / {userPageCount}</span>
+              <button
+                className="journal-page-btn"
+                onClick={() => setUserPage(p => Math.min(userPageCount - 1, p + 1))}
+                disabled={userPage === userPageCount - 1}
+              >→</button>
+            </div>
+          )}
 
           {/* Discovery tab — appears after first entry, pulses until tapped */}
           {state.hasWrittenFirstEntry && (
@@ -149,7 +177,7 @@ export default function Journal({ state, update }) {
               </div>
             )}
 
-            {creatureEntries.map((entry, i) => (
+            {creaturePageEntries.map((entry, i) => (
               <div key={entry.id} className="journal-entry">
                 <div className="je-meta">
                   <span className="je-date">
@@ -163,12 +191,26 @@ export default function Journal({ state, update }) {
                   </span>
                 </div>
                 <div className="je-text je-text-creature prose">{entry.text}</div>
-                {i < creatureEntries.length - 1 && <div className="je-divider" />}
+                {i < creaturePageEntries.length - 1 && <div className="je-divider" />}
               </div>
             ))}
-
-            <div style={{ height: 32 }} />
           </div>
+
+          {creatureEntries.length > 0 && (
+            <div className="journal-pagination">
+              <button
+                className="journal-page-btn"
+                onClick={() => setCreaturePage(p => Math.max(0, p - 1))}
+                disabled={creaturePage === 0}
+              >←</button>
+              <span className="journal-page-count">{creaturePage + 1} / {creaturePageCount}</span>
+              <button
+                className="journal-page-btn"
+                onClick={() => setCreaturePage(p => Math.min(creaturePageCount - 1, p + 1))}
+                disabled={creaturePage === creaturePageCount - 1}
+              >→</button>
+            </div>
+          )}
 
           {/* Tab to flip back */}
           <div

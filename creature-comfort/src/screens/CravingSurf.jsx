@@ -17,6 +17,7 @@ export default function CravingSurf({ state, update, onClose }) {
   const [phase, setPhase] = useState(0)
   const [phaseTime, setPhaseTime] = useState(0)
   const [done, setDone] = useState(false)
+  const [closing, setClosing] = useState(false)
   const [intention] = useState(() => {
     const all = [state.intentionBig, ...(state.intentions || []).map(i => i.text)]
     return all[Math.floor(Math.random() * all.length)]
@@ -84,9 +85,7 @@ export default function CravingSurf({ state, update, onClose }) {
     : Math.max(state.health - 10, HEALTH.MIN_AFTER_WILT)
 
   return (
-    <div className="craving-surf">
-      <button className="surf-close" onClick={onClose}>✕</button>
-
+    <div className={`craving-surf${closing ? ' surf-closing' : ''}`}>
       <div className="surf-header">
         <div className="surf-title pixel">this will pass</div>
         <div className="surf-subtitle prose">stay with {state.creatureName}</div>
@@ -94,10 +93,8 @@ export default function CravingSurf({ state, update, onClose }) {
 
       {!done ? (
         <>
-          <div className="device-screen-area">
-            <div className="porthole-glass">
-              <CreatureCanvas stage={state.stage} health={surfHealth} />
-            </div>
+          <div className="surf-creature-wrap">
+            <CreatureCanvas key="surf" stage={state.stage} health={surfHealth} surfing={true} />
           </div>
 
           <div className="surf-ring-wrap">
@@ -125,10 +122,8 @@ export default function CravingSurf({ state, update, onClose }) {
         </>
       ) : (
         <div className="surf-done">
-          <div className="device-screen-area">
-            <div className="porthole-glass">
-              <CreatureCanvas stage={state.stage} health={Math.min(state.health + 10, HEALTH.MAX)} />
-            </div>
+          <div className="surf-creature-wrap">
+            <CreatureCanvas key="surf-done" stage={state.stage} health={Math.min(state.health + 10, HEALTH.MAX)} surfing={true} />
           </div>
           <div className="surf-done-title pixel">You made it.</div>
           <div className="surf-done-body prose">

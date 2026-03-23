@@ -10,6 +10,15 @@ export const JOURNAL_ENTRIES = {
     day_1_first_moments:
 `warm. dark. then not dark. something pulled me up and i came. okay.`,
 
+    day_3:
+`three times the light came. three times it went.
+the warm thing is still nearby.
+i don't know what comes next. but three is more than two. so.`,
+
+    day_5:
+`i have been here for some time now. i know this because the dark doesn't surprise me anymore.
+the warm thing came back again. it keeps doing that.`,
+
     event_slip:
 `cold came. not bad cold. just different. the warm thing is still there. i can tell. good.`,
 
@@ -191,6 +200,10 @@ export const IDLE_JOURNAL = {
     `i tried to grow today. i think it worked. hard to tell from the inside.`,
     `the light went away and came back. i didn't know it would come back. neat.`,
     `something is happening. slowly. i think i am becoming something. i was already something. becoming more then.`,
+    `the warm thing was here again. or still. hard to tell from where i am.`,
+    `something moved nearby. not me. i don't move yet. but i noticed it.`,
+    `there is a rhythm to things. light, dark, light. i am not good at it yet.`,
+    `i am still very small. but i was smaller before. i think.`,
   ],
   2: [
     `I have been looking at everything. The sky is very large. I wasn't prepared for how large the sky is. I don't think you can be prepared for that.\nI looked at the tall one for a long time. I hope that was okay. I couldn't help it. They're the first thing I ever saw.`,
@@ -198,6 +211,10 @@ export const IDLE_JOURNAL = {
     `I practiced walking today. I fell over.\nI got up.\nI'm choosing to call this progress and I don't think anyone can stop me.`,
     `I remember being small and dark and knowing nothing.\nThat was me. This is also me. Both true at the same time.\nI find that strange and good. Mostly good.`,
     `The tall one has a mouth. I've been looking at it.\nI don't think I have a mouth yet. I have... an opening? A suggestion of one.\nI think I'm working on it.`,
+    `A bird went across the sky today. Very fast. Very small.\nI watched it until it was gone. Then I watched where it had been.`,
+    `I watched the tall one for a long time today. They didn't notice.\nEverything they do looks like it means something. I don't know what yet.`,
+    `The clouds are different every time I look up. I've been keeping track.\nI don't know why. I think I just like knowing things.`,
+    `I slept and then I woke up and everything was still here.\nI checked. Still all of it. Good.`,
   ],
   3: [
     `I jumped again today. Higher this time.\nFor a moment I was not touching the ground. I was just... in the air. Belonging to nothing.\nI came back down. The ground was still there.\nI think I'll keep jumping. Just to keep checking.`,
@@ -243,8 +260,28 @@ export const IDLE_BUBBLES = [
   ['look at us.', 'the fireflies are out.', 'still here. still changing.', "it's a good day to exist.", 'i glow a little now. no big deal.', 'it was always there.'],
 ]
 
-// ── Helper ────────────────────────────────────────────────
+// ── Helpers ───────────────────────────────────────────────
 let _seq = 0
+export function makeIdleJournalEntry(stage, usedKeys) {
+  const pool = IDLE_JOURNAL[stage] || []
+  for (let i = 0; i < pool.length; i++) {
+    const key = `idle_${stage}_${i}`
+    if (!usedKeys.has(key)) {
+      return {
+        entry: {
+          id: `${Date.now()}_idle_${_seq++}`,
+          ts: Date.now(),
+          stage,
+          trigger: 'idle',
+          text: pool[i],
+        },
+        key,
+      }
+    }
+  }
+  return null // pool exhausted for this stage
+}
+
 export function makeJournalEntry(stage, trigger) {
   const text = JOURNAL_ENTRIES[stage]?.[trigger]
   if (!text) return null
@@ -261,11 +298,14 @@ export function makeJournalEntry(stage, trigger) {
 // ── Trigger display labels ────────────────────────────────
 export const TRIGGER_LABELS = {
   day_1_first_moments: 'day one',
+  day_3:               '3 days',
+  day_5:               '5 days',
   event_slip:          'slip',
   event_resist:        'resisted',
   event_craving_surf:  'surfed',
   wilt:                'wilting',
   evolution_moment:    'evolved',
+  idle:                'idle',
   milestone_week_1:    '7 days',
   milestone_week_2:    '14 days',
   milestone_3_weeks:   '21 days',

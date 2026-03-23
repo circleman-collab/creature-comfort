@@ -52,7 +52,7 @@
   overflow: hidden;
   position: relative;
   width: 100%;
-  max-height: calc(100vh - 340px);
+  max-height: 300px;
   flex-shrink: 1;
   min-height: 0;
   display: flex;
@@ -78,8 +78,8 @@
 }
 
 .health-bar-wrap {
-  width: 256px;
-  padding: 8px 0 2px;
+  width: 100%;
+  padding: 0;
 }
 
 .health-bar {
