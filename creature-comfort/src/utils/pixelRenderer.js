@@ -55,6 +55,16 @@ function isSleeping(hour) {
   return hour >= 22 || hour <= 7
 }
 
+// ── Color lerp ────────────────────────────────────────────
+function lerpColor(hexA, hexB, t) {
+  if (t <= 0) return hexA
+  if (t >= 1) return hexB
+  const r1 = parseInt(hexA.slice(1,3), 16), r2 = parseInt(hexB.slice(1,3), 16)
+  const g1 = parseInt(hexA.slice(3,5), 16), g2 = parseInt(hexB.slice(3,5), 16)
+  const b1 = parseInt(hexA.slice(5,7), 16), b2 = parseInt(hexB.slice(5,7), 16)
+  return `rgb(${Math.round(r1+(r2-r1)*t)},${Math.round(g1+(g2-g1)*t)},${Math.round(b1+(b2-b1)*t)})`
+}
+
 // ── Idle animation state ──────────────────────────────────
 // Module-level state enables randomized Animal Crossing-style idle beats.
 // State resets whenever tick < 10 (component remount / fresh start).
@@ -137,10 +147,10 @@ function _tickIdle(stage, tick, sleeping) {
 function px(x, y, col) { return [x, y, col] }
 
 // ── Stage 1: Seedling (just a sprout) ────────────────────
-export function drawStage1(ctx, health, tick, hour = new Date().getHours()) {
-  const wilt = health < HEALTH.WILT_THRESHOLD
-  const col = wilt ? C.w3 : C.g3
-  const col2 = wilt ? C.w2 : C.g4
+export function drawStage1(ctx, health, tick, hour = new Date().getHours(), wiltProgress = 0) {
+  const wilt = wiltProgress >= 0.5
+  const col  = lerpColor(C.g3, C.w3, wiltProgress)
+  const col2 = lerpColor(C.g4, C.w2, wiltProgress)
   const soil = C.b3
   const sleeping = isSleeping(hour)
 
@@ -180,11 +190,11 @@ export function drawStage1(ctx, health, tick, hour = new Date().getHours()) {
 }
 
 // ── Stage 2: Sprout with eyes + root-feet ────────────────
-export function drawStage2(ctx, health, tick, hour = new Date().getHours()) {
-  const wilt = health < HEALTH.WILT_THRESHOLD
+export function drawStage2(ctx, health, tick, hour = new Date().getHours(), wiltProgress = 0) {
+  const wilt = wiltProgress >= 0.5
   const sleeping = isSleeping(hour)
-  const col = wilt ? C.w3 : C.g3
-  const col2 = wilt ? C.w2 : C.g4
+  const col  = lerpColor(C.g3, C.w3, wiltProgress)
+  const col2 = lerpColor(C.g4, C.w2, wiltProgress)
   const idle = _tickIdle(2, tick, sleeping)
   const bob = !sleeping && idle.action === 'bob' && idle.t > 0.15 && idle.t < 0.85 ? -1 : 0
   const blink = idle.blink
@@ -240,8 +250,8 @@ export function drawStage2(ctx, health, tick, hour = new Date().getHours()) {
 }
 
 // ── Stage 3: Leafy creature, can hop ─────────────────────
-export function drawStage3(ctx, health, tick, hour = new Date().getHours(), startedAt = null) {
-  const wilt = health < HEALTH.WILT_THRESHOLD
+export function drawStage3(ctx, health, tick, hour = new Date().getHours(), startedAt = null, wiltProgress = 0) {
+  const wilt = wiltProgress >= 0.5
   const sleeping = isSleeping(hour)
   let stageProgress = 0
   if (!sleeping) {
@@ -249,9 +259,9 @@ export function drawStage3(ctx, health, tick, hour = new Date().getHours(), star
     stageProgress = Math.min(1, Math.max(0, (hoursElapsed - 168) / (336 - 168)))
   }
   const idle = _tickIdle(3, tick, sleeping)
-  const col = wilt ? C.w3 : C.g3
-  const col2 = wilt ? C.w2 : C.g4
-  const col3 = wilt ? C.w1 : C.g5
+  const col  = lerpColor(C.g3, C.w3, wiltProgress)
+  const col2 = lerpColor(C.g4, C.w2, wiltProgress)
+  const col3 = lerpColor(C.g5, C.w1, wiltProgress)
   const blink = idle.blink
 
   // Hop fires as a single 6-phase arc; creature stands still between hops
@@ -332,14 +342,14 @@ export function drawStage3(ctx, health, tick, hour = new Date().getHours(), star
 }
 
 // ── Stage 4: Fur growing through leaves ──────────────────
-export function drawStage4(ctx, health, tick, hour = new Date().getHours()) {
-  const wilt = health < HEALTH.WILT_THRESHOLD
+export function drawStage4(ctx, health, tick, hour = new Date().getHours(), wiltProgress = 0) {
+  const wilt = wiltProgress >= 0.5
   const sleeping = isSleeping(hour)
   const idle = _tickIdle(4, tick, sleeping)
   const breathe = sleeping ? 0 : (Math.floor(tick / 110) % 2 === 0 ? 0 : -1)
-  const col = wilt ? C.w3 : C.g3
-  const fur = wilt ? C.w2 : C.b4
-  const leaf = wilt ? C.w2 : C.g4
+  const col  = lerpColor(C.g3, C.w3, wiltProgress)
+  const fur  = lerpColor(C.b4, C.w2, wiltProgress)
+  const leaf = lerpColor(C.g4, C.w2, wiltProgress)
   const glow = C.a1
   const blink = idle.blink
   const planeActive = (tick % PLANE_CYCLE) <= PLANE_ACTIVE
@@ -805,8 +815,8 @@ function getSkyColors(stage, hour) {
   return base
 }
 
-export function drawEnvironment(ctx, stage, health, tick, inTransition = false, hour = new Date().getHours()) {
-  const wilt = health < HEALTH.WILT_THRESHOLD
+export function drawEnvironment(ctx, stage, health, tick, inTransition = false, hour = new Date().getHours(), wiltProgress = 0) {
+  const wilt = wiltProgress >= 0.5
   const weather = getDailyWeather()
 
   // ── Sky gradient (time-of-day aware) ─────────────────
@@ -817,7 +827,7 @@ export function drawEnvironment(ctx, stage, health, tick, inTransition = false, 
   ctx.fillStyle = skyGrad
   ctx.fillRect(0, 0, W * SCALE, 48 * SCALE)
 
-  if (!wilt && (hour >= 21 || hour < 6)) drawStars(ctx, tick)
+  if (wiltProgress < 0.5 && (hour >= 21 || hour < 6)) drawStars(ctx, tick)
   if (weather < 2) drawSunMoon(ctx, stage, hour, tick)
 
   // ── Ground fill (below horizon) ───────────────────────
@@ -825,20 +835,20 @@ export function drawEnvironment(ctx, stage, health, tick, inTransition = false, 
   ctx.fillRect(0, 48 * SCALE, W * SCALE, (H - 48) * SCALE)
 
   // ── Clouds ─────────────────────────────────────────────
-  if (!wilt) {
+  if (wiltProgress < 0.5) {
     const cloudAlpha = [0.18, 0.24, 0.28, 0.34, 0.40][stage - 1]
     drawClouds(ctx, tick, cloudAlpha, inTransition, weather)
   }
 
   // ── Horizon line (sky meets earth) ────────────────────
   // Subtle lighter band at y=55 — the seam between worlds
-  const horizonCol = wilt ? '#2a1a0a' : '#5a3418'
+  const horizonCol = lerpColor('#5a3418', '#2a1a0a', wiltProgress)
   fill(ctx, Array.from({length: W}, (_, x) => [x, 47]), horizonCol)
 
   // ── Ground surface ────────────────────────────────────
   const groundY = 48
-  fill(ctx, Array.from({length: W}, (_, x) => [x, groundY]),   wilt ? C.b2 : '#4e2c14')
-  fill(ctx, Array.from({length: W}, (_, x) => [x, groundY+1]), wilt ? C.b1 : '#341a0a')
+  fill(ctx, Array.from({length: W}, (_, x) => [x, groundY]),   lerpColor('#4e2c14', C.b2, wiltProgress))
+  fill(ctx, Array.from({length: W}, (_, x) => [x, groundY+1]), lerpColor('#341a0a', C.b1, wiltProgress))
   fill(ctx, Array.from({length: W}, (_, x) => [x, groundY+2]), '#221408')
   for (let dy = 3; dy <= H - groundY - 1; dy++) {
     fill(ctx, Array.from({length: W}, (_, x) => [x, groundY + dy]), '#221408')
@@ -846,20 +856,20 @@ export function drawEnvironment(ctx, stage, health, tick, inTransition = false, 
 
   // ── Grass tufts (stage 2+) ────────────────────────────
   if (stage >= 2) {
-    const grassCol = wilt ? C.w3 : C.g3
+    const grassCol = lerpColor(C.g3, C.w3, wiltProgress)
     const tufts = [
       [3,47],[5,47],[8,47],[12,47],[15,47],[18,47],[21,47],[25,47],
       [44,47],[46,47],[50,47],[53,47],[55,47],[58,47],[62,47],[65,47],
     ]
     fill(ctx, tufts, grassCol)
-    if (!wilt) fill(ctx, [
+    if (wiltProgress < 0.5) fill(ctx, [
       [4,46],[6,46],[9,46],[11,46],[13,46],[16,46],[19,46],[22,46],[26,46],
       [45,46],[47,46],[49,46],[51,46],[54,46],[56,46],[59,46],[63,46],[66,46],
     ], C.g4)
   }
 
   // ── Wildflowers (stage 3+) — two colors ───────────────
-  if (stage >= 3 && !wilt) {
+  if (stage >= 3 && wiltProgress < 0.5) {
     fill(ctx, [[7,46],[14,46],[20,46],[48,46],[55,46],[62,46]], C.a1)
     fill(ctx, [[7,45],[14,45],[20,45],[48,45],[55,45],[62,45]], C.a2)
     fill(ctx, [[10,46],[17,46],[51,46],[59,46]], C.f1)
@@ -868,14 +878,14 @@ export function drawEnvironment(ctx, stage, health, tick, inTransition = false, 
 
   // ── Trees (stage 3+) ──────────────────────────────────
   if (stage >= 3) {
-    drawTree(ctx, 8,  26, wilt, stage)
-    drawTree(ctx, 52, 26, wilt, stage)
+    drawTree(ctx, 8,  26, wilt, stage, false, wiltProgress)
+    drawTree(ctx, 52, 26, wilt, stage, false, wiltProgress)
   }
 
   // ── Background trees (stage 4+) ───────────────────────
   if (stage >= 4) {
-    drawTree(ctx, 2,  30, wilt, stage, true)
-    drawTree(ctx, 58, 30, wilt, stage, true)
+    drawTree(ctx, 2,  30, wilt, stage, true, wiltProgress)
+    drawTree(ctx, 58, 30, wilt, stage, true, wiltProgress)
   }
 
   // ── Fireflies (stage 5) ───────────────────────────────
@@ -897,33 +907,33 @@ export function drawEnvironment(ctx, stage, health, tick, inTransition = false, 
 
   // ── World events ──────────────────────────────────────
   const planeX = drawPlane(ctx, tick)
-  if (stage >= 3 && !wilt) drawCritter(ctx, tick)
+  if (stage >= 3 && wiltProgress < 0.5) drawCritter(ctx, tick)
   drawShootingStar(ctx, tick, hour)
 
   // ── Ambient: bird (stage 2+, no wilt) ────────────────
-  if (stage >= 2 && !wilt) {
+  if (stage >= 2 && wiltProgress < 0.5) {
     drawBird(ctx, tick, false)
     // Bonus bird during transitions
     if (inTransition) drawBird(ctx, tick + 180, true)
   }
 
   // ── Ambient: falling leaf (stage 3+, no wilt) ────────
-  if (stage >= 3 && !wilt) {
+  if (stage >= 3 && wiltProgress < 0.5) {
     drawLeaf(ctx, tick)
   }
 
-  // ── Wilt: rain ────────────────────────────────────────
-  if (wilt) {
-    drawRain(ctx, tick)
+  // ── Wilt: rain and overlay fade in with wiltProgress ──
+  if (wiltProgress > 0) {
+    drawRain(ctx, tick, 0.25 * wiltProgress)
     ctx.save()
-    ctx.globalAlpha = 0.15
+    ctx.globalAlpha = 0.15 * wiltProgress
     ctx.fillStyle = '#4a3010'
     ctx.fillRect(0, 0, W * SCALE, H * SCALE)
     ctx.restore()
   }
 
   // ── Weather effects (non-wilt) ────────────────────────
-  if (!wilt) {
+  if (wiltProgress < 0.5) {
     if (weather === 3) drawWeatherRain(ctx, tick)
     if (weather >= 2) {
       ctx.save()
@@ -1087,9 +1097,9 @@ function drawLeaf(ctx, tick) {
 
 // ── Rain ──────────────────────────────────────────────────
 // Short vertical streaks, randomized x, drifting downward
-function drawRain(ctx, tick) {
+function drawRain(ctx, tick, alpha = 0.25) {
   ctx.save()
-  ctx.globalAlpha = 0.25
+  ctx.globalAlpha = alpha
   ctx.fillStyle = '#6a8870'
   // Use stable pseudo-random x positions seeded per-streak
   const streaks = [4, 11, 17, 24, 31, 37, 43, 50, 57, 62]
@@ -1124,10 +1134,10 @@ function drawStars(ctx, tick) {
   })
 }
 
-function drawTree(ctx, x, baseY, wilt, stage, bg = false) {
+function drawTree(ctx, x, baseY, wilt, stage, bg = false, wiltProgress = 0) {
   const trunk = C.b3
-  const leaf = wilt ? C.w3 : (stage >= 5 ? C.g4 : C.g3)
-  const leaf2 = wilt ? C.w2 : C.g5
+  const leaf  = lerpColor(stage >= 5 ? C.g4 : C.g3, C.w3, wiltProgress)
+  const leaf2 = lerpColor(C.g5, C.w2, wiltProgress)
   const alpha = bg ? 0.5 : 1
 
   ctx.save()
@@ -1228,14 +1238,18 @@ function dot(ctx, x, y, color) {
 
 // ── Transition system ─────────────────────────────────────
 
-function drawCreatureStage(ctx, stage, health, tick, hour, startedAt, surfing = false) {
+function drawCreatureStage(ctx, stage, health, tick, hour, startedAt, surfing = false, wiltProgress = 0) {
+  const droop = Math.round(wiltProgress * 2)
+  ctx.save()
+  ctx.translate(0, droop * SCALE)
   switch (stage) {
-    case 1: drawStage1(ctx, health, tick, hour); break
-    case 2: drawStage2(ctx, health, tick, hour); break
-    case 3: drawStage3(ctx, health, tick, hour, startedAt); break
-    case 4: drawStage4(ctx, health, tick, hour); break
+    case 1: drawStage1(ctx, health, tick, hour, wiltProgress); break
+    case 2: drawStage2(ctx, health, tick, hour, wiltProgress); break
+    case 3: drawStage3(ctx, health, tick, hour, startedAt, wiltProgress); break
+    case 4: drawStage4(ctx, health, tick, hour, wiltProgress); break
     case 5: drawStage5(ctx, health, tick, hour, surfing); break
   }
+  ctx.restore()
 }
 
 function drawTransitionGlow(ctx, stage, alpha, tick) {
@@ -1516,15 +1530,20 @@ export function drawTransition(ctx, fromStage, toStage, progress, health, tick, 
 
 // ── Main draw function ────────────────────────────────────
 
-export function drawScene(ctx, stage, health, tick, hour = new Date().getHours(), startedAt = null, surfing = false) {
+export function drawScene(ctx, stage, health, tick, hour = new Date().getHours(), startedAt = null, surfing = false, wiltProgress = 0, bloomPulse = 0) {
   ctx.clearRect(0, 0, W * SCALE, H * SCALE)
-  drawEnvironment(ctx, stage, health, tick, false, hour)
+  drawEnvironment(ctx, stage, health, tick, false, hour, wiltProgress)
+  drawCreatureStage(ctx, stage, health, tick, hour, startedAt, surfing, wiltProgress)
 
-  switch (stage) {
-    case 1: drawStage1(ctx, health, tick, hour); break
-    case 2: drawStage2(ctx, health, tick, hour); break
-    case 3: drawStage3(ctx, health, tick, hour, startedAt); break
-    case 4: drawStage4(ctx, health, tick, hour); break
-    case 5: drawStage5(ctx, health, tick, hour, surfing); break
+  // Bloom pulse — quiet sigh of relief when creature returns from wilt
+  if (bloomPulse > 0) {
+    ctx.save()
+    const cx = 35 * SCALE, cy = 40 * SCALE
+    const grad = ctx.createRadialGradient(cx, cy, 2 * SCALE, cx, cy, 18 * SCALE)
+    grad.addColorStop(0, `rgba(200, 240, 160, ${bloomPulse * 0.18})`)
+    grad.addColorStop(1, 'rgba(200, 240, 160, 0)')
+    ctx.fillStyle = grad
+    ctx.fillRect(0, 0, W * SCALE, H * SCALE)
+    ctx.restore()
   }
 }
