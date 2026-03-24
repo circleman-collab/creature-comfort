@@ -735,22 +735,23 @@ function drawShootingStar(ctx, tick, hour) {
   ctx.restore()
 }
 
-function drawSunMoon(ctx, stage, hour, tick) {
+function drawSunMoon(ctx, stage, fractHour, tick) {
   // Arc progress across the sky: 0.0 (left) to 1.0 (right)
   // Sun arcs from hour 6 to 20. Moon from hour 20 to 6 (next day).
-  const isSun = hour >= 6 && hour < 20
-  const isNight = hour >= 20 || hour < 6
+  // fractHour is a continuous float (e.g. 14.5 = 2:30pm) for smooth arc movement.
+  const isSun = fractHour >= 6 && fractHour < 20
+  const isNight = fractHour >= 20 || fractHour < 6
 
   // x: arc across width, y: dips toward horizon at midpoint
   let progress, bodyY
 
   if (isSun) {
-    progress = (hour - 6) / 14  // 0 at 6am, 1 at 8pm
+    progress = (fractHour - 6) / 14  // 0 at 6am, 1 at 8pm
     // Arc: highest at noon (progress=0.5), lowest at edges
     bodyY = Math.round(8 + 14 * Math.abs(progress - 0.5) * 2)
   } else {
     // Night: hour 20-24 maps 0→0.33, hour 0-6 maps 0.33→1
-    const nightHour = hour >= 20 ? hour - 20 : hour + 4
+    const nightHour = fractHour >= 20 ? fractHour - 20 : fractHour + 4
     progress = nightHour / 10
     bodyY = Math.round(6 + 10 * Math.abs(progress - 0.5) * 2)
   }
@@ -808,7 +809,7 @@ function drawSunMoon(ctx, stage, hour, tick) {
   ctx.restore()
 }
 
-function getSkyColors(stage, hour) {
+function getSkyColors(stage, fractHour) {
   const times = {
     night:   ['#0a0c1a', '#0f1028'],
     dawn:    ['#1a1030', '#2e1a3a'],
@@ -817,32 +818,50 @@ function getSkyColors(stage, hour) {
     dusk:    ['#2a1828', '#3a2040'],
     evening: ['#140e22', '#1e1430'],
   }
-  let base
-  if (hour >= 22 || hour < 5)  base = times.night
-  else if (hour < 7)            base = times.dawn
-  else if (hour < 10)           base = times.morning
-  else if (hour < 16)           base = times.day
-  else if (hour < 19)           base = times.dusk
-  else                          base = times.evening
-
-  const stageTint = (stage - 1) * 0.04
-  return base
+  // Sequential periods with blend window of 0.75h before each boundary
+  const periods = [
+    [0,  5,  'night',   'dawn'],
+    [5,  7,  'dawn',    'morning'],
+    [7,  10, 'morning', 'day'],
+    [10, 16, 'day',     'dusk'],
+    [16, 19, 'dusk',    'evening'],
+    [19, 22, 'evening', 'night'],
+    [22, 24, 'night',   'dawn'],
+  ]
+  const BLEND = 0.75
+  const [start, end, key, nextKey] = periods.find(([s, e]) => fractHour >= s && fractHour < e) || periods[0]
+  const t = Math.max(0, 1 - (end - fractHour) / BLEND)
+  const cur = times[key], nxt = times[nextKey]
+  if (t <= 0) return cur
+  return [lerpColor(cur[0], nxt[0], t), lerpColor(cur[1], nxt[1], t)]
 }
 
 export function drawEnvironment(ctx, stage, health, tick, inTransition = false, hour = new Date().getHours(), wiltProgress = 0) {
   const wilt = wiltProgress >= 0.5
+  const now = new Date()
+  const fractHour = hour + now.getMinutes() / 60
   const weather = getDailyWeather()
 
-  // ── Sky gradient (time-of-day aware) ─────────────────
-  const [skyTop, skyBot] = getSkyColors(stage, hour)
+  // ── Sky gradient (time-of-day aware, blends between periods) ─
+  const [skyTop, skyBot] = getSkyColors(stage, fractHour)
   const skyGrad = ctx.createLinearGradient(0, 0, 0, 48 * SCALE)
   skyGrad.addColorStop(0, skyTop)
   skyGrad.addColorStop(1, skyBot)
   ctx.fillStyle = skyGrad
   ctx.fillRect(0, 0, W * SCALE, 48 * SCALE)
 
-  if (wiltProgress < 0.5 && (hour >= 21 || hour < 6)) drawStars(ctx, tick)
-  if (weather < 2) drawSunMoon(ctx, stage, hour, tick)
+  // Stars fade in hour 20→21, full 21→6, fade out 6→7
+  if (wiltProgress < 0.5) {
+    const starAlpha = fractHour >= 21 || fractHour < 6 ? 1
+      : fractHour >= 20 ? fractHour - 20
+      : fractHour < 7   ? Math.max(0, 1 - (fractHour - 6)) : 0
+    if (starAlpha > 0) {
+      ctx.save(); ctx.globalAlpha = starAlpha
+      drawStars(ctx, tick)
+      ctx.restore()
+    }
+  }
+  if (weather < 2) drawSunMoon(ctx, stage, fractHour, tick)
 
   // ── Ground fill (below horizon) ───────────────────────
   ctx.fillStyle = '#221408'
